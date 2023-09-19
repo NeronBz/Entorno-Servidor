@@ -7,10 +7,7 @@
 </head>
 <body>
     <?php
-    $codigo=$_GET['asig'];
-    $nombre =$_GET['nombre'];
-
-    echo '<h1>Se ha seleccionado la asignatura '.$codigo.'-'.$nombre.'</h1>';
+    echo '<h1>Se ha seleccionado '.$_GET['nombre'].' :'.$_GET['edad'].'</h1>';
     ?>
 </body>
 </html>
