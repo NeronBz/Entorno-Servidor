@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <form action="Ejercicio14_tratamiento.php" method="post">
+    <form action="Ejercicio14_tratamiento.php" method="post" enctype="multipart/form-data">
         <fieldset>
             <legend>Datos Personales</legend>
             <div>
@@ -29,8 +29,8 @@
             <div>
                 <label>Sexo</label>
                 <br />
-                <input type="radio" name="sexo" checked="checked" />Hombre
-                <input type="radio" name="sexo" checked="checked" />Mujer
+                <input type="radio" name="sexo" checked="checked" value="H" />Hombre
+                <input type="radio" name="sexo" value="M" />Mujer
             </div>
             <div>
                 <label>Fecha Nacimiento</label>
@@ -40,7 +40,7 @@
             <div>
                 <label>País</label>
                 <br />
-                <select name="pais" multiple="multiple">
+                <select name="pais[]" multiple="multiple">
                     <option selected="selected">España</option>
                     <option>Portugal</option>
                     <option>EEUU</option>
