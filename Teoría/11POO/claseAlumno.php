@@ -20,66 +20,66 @@ class Alumno
 
     function __destruct()
     {
-        echo 'Alumno ' . $this->nombre . ' dado de baja';
+        // echo 'Alumno ' . $this->nombre . ' dado de baja';
     }
 
-        /**
-         * Get the value of numExp
-         */ 
-        public function getNumExp()
-        {
-                return $this->numExp;
-        }
+    /**
+     * Get the value of numExp
+     */
+    public function getNumExp()
+    {
+        return $this->numExp;
+    }
 
-        /**
-         * Set the value of numExp
-         *
-         * @return  self
-         */ 
-        public function setNumExp($numExp)
-        {
-                $this->numExp = $numExp;
+    /**
+     * Set the value of numExp
+     *
+     * @return  self
+     */
+    public function setNumExp($numExp)
+    {
+        $this->numExp = $numExp;
 
-                return $this;
-        }
+        return $this;
+    }
 
-        /**
-         * Get the value of nombre
-         */ 
-        public function getNombre()
-        {
-                return $this->nombre;
-        }
+    /**
+     * Get the value of nombre
+     */
+    public function getNombre()
+    {
+        return $this->nombre;
+    }
 
-        /**
-         * Set the value of nombre
-         *
-         * @return  self
-         */ 
-        public function setNombre($nombre)
-        {
-                $this->nombre = $nombre;
+    /**
+     * Set the value of nombre
+     *
+     * @return  self
+     */
+    public function setNombre($nombre)
+    {
+        $this->nombre = $nombre;
 
-                return $this;
-        }
+        return $this;
+    }
 
-        /**
-         * Get the value of fechaN
-         */ 
-        public function getFechaN()
-        {
-                return $this->fechaN;
-        }
+    /**
+     * Get the value of fechaN
+     */
+    public function getFechaN()
+    {
+        return $this->fechaN;
+    }
 
-        /**
-         * Set the value of fechaN
-         *
-         * @return  self
-         */ 
-        public function setFechaN($fechaN)
-        {
-                $this->fechaN = $fechaN;
+    /**
+     * Set the value of fechaN
+     *
+     * @return  self
+     */
+    public function setFechaN($fechaN)
+    {
+        $this->fechaN = $fechaN;
 
-                return $this;
-        }
+        return $this;
+    }
 }
