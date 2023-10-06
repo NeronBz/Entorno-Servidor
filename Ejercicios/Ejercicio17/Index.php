@@ -62,7 +62,29 @@ $ad = new Modelo();
             }
         }
     }
+    $citas = $ad->obtenerCitas();
     ?>
+    <table width="50%" align="center">
+        <tr>
+            <td><b>Fecha</b></td>
+            <td><b>Hora</b></td>
+            <td><b>Cliente</b></td>
+            <td><b>Tipo Servicio</b></td>
+            <td><b>Duración</b></td>
+            <td><b>Hora de fin</b></td>
+        </tr>
+        <?php
+        foreach ($citas as $c) {
+            echo '<tr>';
+            echo '<td>' . date('d/m/Y', strtotime($c->getFecha())) . '</td>';
+            echo '<td>' . $c->getHora() . '</td>';
+            echo '<td>' . $c->getNombreC() . '</td>';
+            echo '<td>' . $c->obtenerNombreServicio() . '</td>';
+            echo '<td>' . $c->obtenerTiempoServicio() . '</td>';
+            echo '<td>' . date('H:i', strtotime('1969-12-31' . $c->getHora()) + ($c->obtenerTiempoServicio() * 60)) . '</td>';
+        }
+        ?>
+    </table>
 </body>
 
 </html>
