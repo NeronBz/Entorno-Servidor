@@ -1,5 +1,6 @@
 <?php
 require_once 'modelo.php';
+require_once 'Vivienda.php';
 $ad = new Modelo();
 ?>
 <!DOCTYPE html>
@@ -61,11 +62,11 @@ $ad = new Modelo();
     </div>
     <?php
     if (isset($_POST['crear'])) {
-        if (empty($_POST['tipoV'] or $_POST['zona'] or $_POST['direccion'] or $_POST['nH'] or $_POST['precio'] or $_POST['tamanio'])) {
+        if (empty($_POST['direccion'] or $_POST['precio'] or $_POST['tamanio'])) {
             echo '<h3 style="color:red;">Debes rellenar todos los campos</h3>';
         } else {
             $v = new Vivienda($_POST['tipoV'], $_POST['zona'], $_POST['direccion'], $_POST['nH'], $_POST['precio'], $_POST['tamanio'], $_POST['extra'], $_POST['comentario']);
-            if ($ad->crearVivienda($c)) {
+            if ($ad->crearVivienda($v)) {
                 echo '<h3 style="color:blue">Vivienda creada</h3>';
             } else {
                 echo '<h3 style="color:red">Error al crear la vivienda</h3>';
