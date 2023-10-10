@@ -36,7 +36,9 @@ class Modelo
             $archivos = file($this->nombreFichero);
             foreach ($archivos as $linea) {
                 $pos = explode(';', $linea);
-                $vivienda = new Vivienda($pos[0], $pos[1], $pos[2], $pos[3], $pos[4], $pos[5], $pos[6], $pos[7]);
+                $vivienda = new Vivienda($pos[0], $pos[1], $pos[2], $pos[3], $pos[4], $pos[5]);
+                $vivienda->setExtra($pos[6]);
+                $vivienda->setComentario($pos[7]);
                 $resultado[] = $vivienda;
             }
         }

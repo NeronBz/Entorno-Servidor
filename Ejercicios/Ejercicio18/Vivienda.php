@@ -7,41 +7,17 @@ class Vivienda
     private int $nH;
     private int $precio;
     private int $tamanio;
-    private string $extra;
-    private string $comentario;
+    private string $extra = "";
+    private string $comentario = "";
 
-    public function __construct($tipoV, $zona, $direccion, $nH, $precio, $tamanio, $extra, $comentario)
+    public function __construct($tipoV, $zona, $direccion, $nH, $precio, $tamanio)
     {
-        $this->$tipoV = $tipoV;
-        $this->$zona = $zona;
-        $this->$direccion = $direccion;
-        $this->$nH = $nH;
-        $this->$precio = $precio;
-        $this->$tamanio = $tamanio;
-        $this->$extra = $extra;
-        $this->$comentario = $comentario;
-    }
-
-    public function obtenerTipoVivienda()
-    {
-        switch ($this->tipoV) {
-            case '1':
-                return 'Adosado';
-            case '2':
-                return 'Unifamiliar';
-            case '3':
-                return 'Piso';
-        }
-    }
-
-    public function obtenerZona()
-    {
-        switch ($this->zona) {
-            case '1':
-                return 'Centro';
-            case '2':
-                return 'Periferia';
-        }
+        $this->tipoV = $tipoV;
+        $this->zona = $zona;
+        $this->direccion = $direccion;
+        $this->nH = $nH;
+        $this->precio = $precio;
+        $this->tamanio = $tamanio;
     }
 
     /**

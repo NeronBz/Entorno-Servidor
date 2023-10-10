@@ -1,0 +1,2 @@
+Unifamiliar;Periferia;c/Alvarez;3;24;109;Trastero,Piscina;w;
+Piso;Centro;c/Alvarez;1;24;109;Garaje;no me gusta;
