@@ -1,0 +1,9 @@
+28980542J;Raúl;Suite;3;2;Tarjeta;Array;
+28980542J;Raúl;Doble;3;2;Tarjeta;Array;
+28980542J;dg;Suite;2;3;Efectivo;Cama Supletoria,Lavandería;
+28980542J;dg;Suite;2;3;Efectivo;Cuna;
+28980542J;Raúl;Individual;6;1;Tarjeta;Cuna,Lavandería;
+28980542J;Raúl;Individual;6;1;Tarjeta;Cuna,Cama Supletoria,Lavandería;
+28980542J;Raúl;Individual;6;1;Tarjeta;Cuna,Cama Supletoria;
+28980542J;Raúl;Individual;6;1;Tarjeta;Cuna,Cama Supletoria;
+gh;dg;Individual;2;2;Tarjeta;Cuna,Cama Supletoria;

@@ -1,4 +1,8 @@
 <?php
+require_once 'modelo.php';
+require_once 'Estancia.php';
+$ad = new Modelo();
+
 function rellenarSelected($campo, $item, $opcionPorDefecto)
 {
     //Si el item viene en $_POST, hay que marcarlo como seleccionado
@@ -81,9 +85,9 @@ function rellenarRadio($campo, $item, $opcionPorDefecto)
         <br />
         <div>
             <label>Opciones</label><br />
-            <input type="checkbox" name="opciones[]" value="1" <?php if (isset($_POST['opciones']) && in_array('1', $_POST['opciones'])) echo 'checked'; ?> />Cuna
-            <input type="checkbox" name="opciones[]" value="2" <?php if (isset($_POST['opciones']) && in_array('2', $_POST['opciones'])) echo 'checked'; ?> />Cama Supletoria
-            <input type="checkbox" name="opciones[]" value="3" <?php if (isset($_POST['opciones']) && in_array('3', $_POST['opciones'])) echo 'checked'; ?> />Lavandería
+            <input type="checkbox" name="opciones[]" value="Cuna" <?php if (isset($_POST['opciones']) && in_array('Cuna', $_POST['opciones'])) echo 'checked'; ?> />Cuna
+            <input type="checkbox" name="opciones[]" value="Cama Supletoria" <?php if (isset($_POST['opciones']) && in_array('Cama Supletoria', $_POST['opciones'])) echo 'checked'; ?> />Cama Supletoria
+            <input type="checkbox" name="opciones[]" value="Lavandería" <?php if (isset($_POST['opciones']) && in_array('Lavandería', $_POST['opciones'])) echo 'checked'; ?> />Lavandería
         </div>
         <br />
         <div>
@@ -105,7 +109,7 @@ function rellenarRadio($campo, $item, $opcionPorDefecto)
                 //Chequeo de cuna y cama
                 //Por posición
                 if (isset($_POST['opciones']) and isset($_POST['opciones'][1])) {
-                    if ($_POST['opciones'][0] == 1 and $_POST['opciones'][1] == 2) {
+                    if ($_POST['opciones'][0] == 'Cuna' and $_POST['opciones'][1] == 'Cama supletoria') {
                         echo '<h3 style="color:red;">Error:No se puede marcar cuna y cama supletoria</h3>';
                         $error = true;
                     }
@@ -132,27 +136,55 @@ function rellenarRadio($campo, $item, $opcionPorDefecto)
                         $importe *= 0.90;
                     }
 
-                    echo '<h3 style="color:blue;">Entrada correcta. El importe de la estancia es de ' . $importe . '€</h3>';
+                    $e = new Estancia(
+                        $_POST['dni'],
+                        $_POST['nombre'],
+                        $_POST['tipoH'],
+                        $_POST['numero'],
+                        $_POST['estancia'],
+                        $_POST['pago'],
+                        $_POST['opciones']
+                    );
+
+                    $stropciones = implode(',', $_POST['opciones']);
+                    $e->setOpciones($stropciones);
+
+                    if ($ad->crearEstancia($e)) {
+                        echo '<h3 style="color:blue;">Entrada correcta. El importe de la estancia es de ' . $importe . '€</h3>';
+                    } else {
+                        echo '<h3 style="color:red">Error al crear la vivienda</h3>';
+                    }
                 }
-                //Comprobando los valores del array sin usar funciones de array
-                /*if(isset($_POST['opciones'])){
-                        $hayCuna = false;
-                        foreach($_POST['opciones'] as $o){
-                            if($o==1 or $o==2){
-                                if(!$hayCuna){
-                                    $hayCuna=true;
-                                }
-                                else{
-                                    echo '<h3 style="color:red;">Error:No se puede marcar cuna y cama supletoria</h3>';
-                                }
-                                
-                            }
-                        }
-                    }*/
             }
         }
     }
+    if (isset($_POST['ver'])) {
+        $estan = $ad->obtenerEstancias();
     ?>
+        <table>
+            <tr>
+                <td><b>DNI</b></td>
+                <td><b>Nombre</b></td>
+                <td><b>Tipo de habitación</b></td>
+                <td><b>Número de noches</b></td>
+                <td><b>Estancia</b></td>
+                <td><b>Pago</b></td>
+                <td><b>Opciones</b></td>
+            </tr>
+        <?php
+        foreach ($estan as $e) {
+            echo '<tr>';
+            echo '<td>' . $e->getDni() . '</td>';
+            echo '<td>' . $e->getNombre() . '</td>';
+            echo '<td>' . $e->getTipoH() . '</td>';
+            echo '<td>' . $e->getNNoches() . '</td>';
+            echo '<td>' . $e->getEstancia() . '</td>';
+            echo '<td>' . $e->getPago() . '</td>';
+            echo '<td>' . $e->getOpciones() . '</td>';
+        }
+    }
+        ?>
+        </table>
 </body>
 
 </html>
