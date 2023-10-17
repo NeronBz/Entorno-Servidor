@@ -1,0 +1,3 @@
+3;as;2023-09-29;Benjamin;Masculina;Segunda B;Entrenamientos,Chandal;
+5;Abduscan;2023-10-24;Alevin;Masculina;Segunda B;Partidos,Chandal,Bolso;
+7;Cristiano Ronaldo;2023-10-07;Alevin;Masculina;Primera,Segunda B;Partidos,Chandal;
