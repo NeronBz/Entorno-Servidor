@@ -30,6 +30,7 @@ if (isset($_POST['crear'])) {
     <h1>CALENDARIO DE EVENTOS</h1>
     <form action="" method="post">
         <table>
+            <h1>Hueles a Krispy</h1>
             <tr>
                 <th>Fecha</th>
                 <th>Hora</th>
