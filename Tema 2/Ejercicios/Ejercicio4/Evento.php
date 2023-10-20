@@ -7,9 +7,9 @@ class Evento
 
     public function __construct($fecha, $hora, $asunto)
     {
-        $this->$fecha;
-        $this->$hora;
-        $this->$asunto;
+        $this->fecha = $fecha;
+        $this->hora = $hora;
+        $this->asunto = $asunto;
     }
 
     /**
