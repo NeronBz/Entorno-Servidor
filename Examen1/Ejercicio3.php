@@ -40,7 +40,7 @@ function rellenarRadio($campo, $item, $opcionPorDefecto)
             <legend>Nuevo Jugador</legend>
             <div>
                 <label>Nº de Jugador</label><br />
-                <input type="text" name="nJugador" value="<?php
+                <input type="number" name="nJugador" value="<?php
                                                             echo (isset($_POST['nJugador']) ? $_POST['nJugador'] : '');
                                                             ?>" />
             </div>
@@ -79,19 +79,19 @@ function rellenarRadio($campo, $item, $opcionPorDefecto)
                     <option value="Primera" <?php if (isset($_POST['competi']) && in_array(
                                                 'Primera',
                                                 $_POST['competi']
-                                            )) echo 'checked'; ?>>Primera</option>
+                                            )) echo 'selected'; ?>>Primera</option>
                     <option value="Segunda A" <?php if (isset($_POST['competi']) && in_array(
                                                     'Segunda A',
                                                     $_POST['competi']
-                                                )) echo 'checked'; ?>>Segunda A</option>
+                                                )) echo 'selected'; ?>>Segunda A</option>
                     <option value="Segunda B" <?php if (isset($_POST['competi']) && in_array(
                                                     'Segunda B',
                                                     $_POST['competi']
-                                                )) echo 'checked'; ?>>Segunda B</option>
+                                                )) echo 'selected'; ?>>Segunda B</option>
                     <option value="Tercera" <?php if (isset($_POST['competi']) && in_array(
                                                 'Tercera',
                                                 $_POST['competi']
-                                            )) echo 'checked'; ?>>Tercera</option>
+                                            )) echo 'selected'; ?>>Tercera</option>
                 </select>
             </div>
             <br>
@@ -126,78 +126,73 @@ function rellenarRadio($campo, $item, $opcionPorDefecto)
     <?php
     //Chequeos
     if (isset($_POST['enviar'])) {
-        $error = false;
         //Campos vacíos
         if (
             empty($_POST['nJugador']) or empty($_POST['nombre'])  or empty($_POST['fechaN'])
-            or empty($_POST['categoria'])  or empty($_POST['tipoC'])  or empty($_POST['competi'])
-            or empty($_POST['equipaciones'])
+            or empty($_POST['categoria'])  or !isset($_POST['tipoC'])  or !isset($_POST['competi'])
+            or !isset($_POST['equipaciones'])
         ) {
             echo '<h3 style="color:red;">Error: Todos los campos tienen que estar rellenos</h3>';
-            $error = true;
-        }
-
-        //Control de categoría mixta
-        if ($_POST['tipoC'] == 'Mixta') {
-            if (
-                $_POST['categoria'] == 'Infantil' || $_POST['categoria'] == 'Cadete'
-                || $_POST['categoria'] == 'Junior' || $_POST['categoria'] == 'Senior'
-            ) {
+        } else {
+            //Control de categoría mixta
+            if ($_POST['tipoC'] == 'Mixta' and $_POST['categoria'] != 'Benjamin' and $_POST['categoria'] != 'Alevin') {
                 echo '<h3 style="color:red;">Error: La categoría "Mixta" solo está disponible 
                     para "Benjamín" o "Alevín"</h3>';
-                $error = true;
-            }
-        }
-
-        //Equipación marcada
-        $eSeleccionadas = $_POST['equipaciones'];
-        if (
-            !in_array('Entrenamiento', $eSeleccionadas) || !in_array('Partidos', $eSeleccionadas)
-        ) {
-            echo '<h3 style="color:red;">Error: Se tiene que marcar al menos una equipación
-                    (Entrenamientos ó Partidos)</h3>';
-            $error = true;
-        }
-
-        //Cálculo del precio
-        if (!$error) {
-            $importe = 0;
-            foreach ($_POST['equipaciones'] as $item) {
-                if ($item == 'Entrenamientos') {
-                    $importe += 25;
-                }
-                if ($item == 'Partidos') {
-                    $importe += 25;
-                }
-                if ($item == 'Chandal') {
-                    $importe += 40;
-                }
-                if ($item == 'Bolso') {
-                    $importe += 15;
-                }
-            }
-
-            $j = new Jugador(
-                $_POST['nJugador'],
-                $_POST['nombre'],
-                $_POST['fechaN'],
-                $_POST['categoria'],
-                $_POST['tipoC'],
-                $_POST['competi'],
-                $_POST['equipaciones']
-            );
-
-            $strCompeti = implode(',', $_POST['competi']);
-            $j->setCompeti($strCompeti);
-
-            $strEquipaciones = implode(',', $_POST['equipaciones']);
-            $j->setEquipaciones($strEquipaciones);
-
-            if ($ad->crearJugador($j)) {
-                echo '<h3 style="color:blue;">Datos correctos. El importe a pagar es de 
-                ' . $importe . '€</h3>';
             } else {
-                echo '<h3 style="color:red">Error al crear la vivienda</h3>';
+                //Equipación marcada
+                foreach ($_POST['equipaciones'] as $e) {
+                    if ($e == 'Entrenamientos' or $e == 'Partidos') {
+                        $error = false;
+                        break;
+                    } else {
+                        $error = true;
+                    }
+                }
+                if ($error) {
+                    echo '<h3 style="color:red;">Error: Se tiene que marcar al menos una equipación
+                        (Entrenamientos ó Partidos)</h3>';
+                }
+
+                if (!isset($error) or $error == false) {
+                    //Precio
+                    $importe = 0;
+                    foreach ($_POST['equipaciones'] as $item) {
+                        if ($item == 'Entrenamientos') {
+                            $importe += 25;
+                        }
+                        if ($item == 'Partidos') {
+                            $importe += 25;
+                        }
+                        if ($item == 'Chandal') {
+                            $importe += 40;
+                        }
+                        if ($item == 'Bolso') {
+                            $importe += 15;
+                        }
+                    }
+                    $j = new Jugador(
+                        $_POST['nJugador'],
+                        $_POST['nombre'],
+                        $_POST['fechaN'],
+                        $_POST['categoria'],
+                        $_POST['tipoC'],
+                        $_POST['competi'],
+                        $_POST['equipaciones']
+                    );
+
+                    $strCompeti = implode(',', $_POST['competi']);
+                    $j->setCompeti($strCompeti);
+
+                    $strEquipaciones = implode(',', $_POST['equipaciones']);
+                    $j->setEquipaciones($strEquipaciones);
+
+                    if ($ad->crearJugador($j)) {
+                        echo '<h3 style="color:blue;">Datos correctos. El importe a pagar es de 
+                        ' . $importe . '€</h3>';
+                    } else {
+                        echo '<h3 style="color:red">Error al crear la vivienda</h3>';
+                    }
+                }
             }
         }
     }

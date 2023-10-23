@@ -13,7 +13,7 @@
             <legend>Nuevo Jugador</legend>
             <div>
                 <label>Nº de Jugador</label><br />
-                <input type="text" name="nJugador" />
+                <input type="number" name="nJugador" />
             </div>
             <div>
                 <label>Nombre y Apellidos</label><br />
@@ -73,52 +73,50 @@
         //Campos vacíos
         if (
             empty($_POST['nJugador']) or empty($_POST['nombre'])  or empty($_POST['fechaN'])
-            or empty($_POST['categoria'])  or empty($_POST['tipoC'])  or empty($_POST['competi'])
-            or empty($_POST['equipaciones'])
+            or empty($_POST['categoria'])  or !isset($_POST['tipoC'])  or !isset($_POST['competi'])
+            or !isset($_POST['equipaciones'])
         ) {
             echo '<h3 style="color:red;">Error: Todos los campos tienen que estar rellenos</h3>';
         } else {
             //Control de categoría mixta
-            if (isset($_POST['tipoC']) == 'Mixta') {
-                if (
-                    !isset($_POST['categoria']) == 'Benjamin' or !isset($_POST['categoria']) == 'Alevin'
-                ) {
-                    echo '<h3 style="color:red;">Error: La categoría "Mixta" solo está disponible 
+            if ($_POST['tipoC'] == 'Mixta' and $_POST['categoria'] != 'Benjamin' and $_POST['categoria'] != 'Alevin') {
+                echo '<h3 style="color:red;">Error: La categoría "Mixta" solo está disponible 
                     para "Benjamín" o "Alevín"</h3>';
-                } else {
-                    //Equipación marcada
-                    if (
-                        !isset($_POST['equipaciones'][0]) == 'Entrenamientos'
-                        or !isset($_POST['equipaciones'][0]) == 'Partidos'
-                        or !isset($_POST['equipaciones'][1]) == 'Entrenamientos'
-                        or !isset($_POST['equipaciones'][1]) == 'Partidos'
-                    ) {
-                        echo '<h3 style="color:red;">Error: Se tiene que marcar al menos una equipación
-                        (Entrenamientos ó Partidos)</h3>';
+            } else {
+                //Equipación marcada
+                foreach ($_POST['equipaciones'] as $e) {
+                    if ($e == 'Entrenamientos' or $e == 'Partidos') {
+                        $error = false;
+                        break;
+                    } else {
                         $error = true;
                     }
+                }
+                if ($error) {
+                    echo '<h3 style="color:red;">Error: Se tiene que marcar al menos una equipación
+                        (Entrenamientos ó Partidos)</h3>';
+                }
 
-                    if (!isset($error)) {
-                        //Precio
-                        $importe = 0;
-                        foreach ($_POST['equipaciones'] as $item) {
-                            if ($item == 'Entrenamientos') {
-                                $importe += 25;
-                            }
-                            if ($item == 'Partidos') {
-                                $importe += 25;
-                            }
-                            if ($item == 'Chandal') {
-                                $importe += 40;
-                            }
-                            if ($item == 'Bolso') {
-                                $importe += 15;
-                            }
+                if (!isset($error) or $error == false) {
+                    //Precio
+                    $importe = 0;
+                    foreach ($_POST['equipaciones'] as $item) {
+                        if ($item == 'Entrenamientos') {
+                            $importe += 25;
                         }
-
-                        echo '<h3 style="color:blue;">Datos correctos. El importe a pagar es de 
-                        ' . $importe . '€</h3>';
+                        if ($item == 'Partidos') {
+                            $importe += 25;
+                        }
+                        if ($item == 'Chandal') {
+                            $importe += 40;
+                        }
+                        if ($item == 'Bolso') {
+                            $importe += 15;
+                        }
                     }
+
+                    echo '<h3 style="color:blue;">Datos correctos. El importe a pagar es de 
+                        ' . $importe . '€</h3>';
                 }
             }
         }
