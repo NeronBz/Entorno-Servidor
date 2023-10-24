@@ -1,8 +1,20 @@
 <?php
 if (isset($_POST['tirar'])) {
     //Comprobar si hay nombre de jugador
-    if (!empty($_POST['nombre'])) {
-        $mensaje = '<h2 style="color:red;">Debes rellenar el nombre del jugador</h2>';
+    if (empty($_POST['nombre'])) {
+        $mensaje = '<span style="color:red;">*Debes rellenar el nombre del jugador</span>';
+    } else {
+        session_start();
+        //Recuperar los datos si existen de la sesión
+        if (isset($_SESSION['jugadores'])) {
+            $jugadores = $_SESSION['jugadores'];
+        }
+        //Generar nº
+        $numero = rand(1, 6);
+        //Guardar datos en un array
+        $jugadores[] = array($_POST['nombre'] => $numero);
+        //Guardar en sesión
+        $_SESSION['jugadores'] = $jugadores;
     }
 } elseif (isset($_POST['borrar'])) {
 }
@@ -21,7 +33,7 @@ if (isset($_POST['tirar'])) {
         <div>
             <label>Nombre del Jugador</label>
             <br>
-            <input type="text" name="nombre" placeholder="Nombre Jugador" required="required">
+            <input type="text" name="nombre" placeholder="Nombre Jugador">
             <?php
             if (isset($mensaje)) {
                 echo $mensaje;
@@ -33,6 +45,10 @@ if (isset($_POST['tirar'])) {
         </div>
         <?php
         //Mostrar tiradas
+        if (isset($_SESSION['jugadores']))
+            foreach ($_SESSION['jugadores'] as $clave => $valor) {
+                echo '<li>' . $clave . '</li>';
+            }
         ?>
 
     </form>
