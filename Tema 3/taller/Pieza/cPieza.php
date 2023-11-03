@@ -33,6 +33,51 @@ if ($bd->getConexion() == null) {
                 $mensaje = array('e', 'Pieza ya existe:' . $p->getCodigo() . ' ' . $p->getDescripcion());
             }
         }
+    } elseif (isset($_POST['update'])) {
+        //Modificar Pieza
+        //Comprobar que todos los datos estén rellenos
+        if (
+            empty($_POST['codigo']) or empty($_POST['clase']) or empty($_POST['desc'])
+            or empty($_POST['precio']) or empty($_POST['stock'])
+        ) {
+            $mensaje = array('e', 'Debes rellenar todos los campos');
+        } else {
+            //Comprobar que no existe una pieza con el mismo código
+            $p = $bd->obtenerPieza($_POST['codigo']);
+            if ($p == null or $p->getCodigo() == $_POST['update']) {
+                $p = new Pieza();
+                $p->setCodigo($_POST['codigo']);
+                $p->setClase($_POST['clase']);
+                $p->setDescripcion($_POST['desc']);
+                $p->setPrecio($_POST['precio']);
+                $p->setStock($_POST['stock']);
+                if ($bd->modificarPieza($p, $_POST['update'])) {
+                    $mensaje = array('i', 'Pieza modificada');
+                } else {
+                    $mensaje = array('e', 'Error al modificar la pieza');
+                }
+            } else {
+                $mensaje = array('e', 'Ya existe una pieza con código ' . $_POST['codigo']);
+            }
+        }
+    } elseif (isset($_POST['borrar'])) {
+        //Chequear que la pieza exista
+        $p = $bd->obtenerPieza($_POST['borrar']);
+        if ($p != null) {
+            //Comprobar que se puede borrar (si no se ha usado en ninguna reparación)
+            if ($bd->existenReparaciones($p->getCodigo())) {
+                $mensaje = array('e', 'No se puede borrar la pieza porque está actualmente en reparaciones');
+            } else {
+                //Borrar la pieza
+                if ($bd->borrarPieza($p->getCodigo())) {
+                    $mensaje = array('i', 'Pieza borrada');
+                } else {
+                    $mensaje = array('e', 'Se ha producido un error al borrar la pieza');
+                }
+            }
+        } else {
+            $mensaje = array('e', 'Error, la pieza no existe');
+        }
     }
 }
 ?>
@@ -55,101 +100,16 @@ if ($bd->getConexion() == null) {
         <h3 style="text-align: center;">GESTIÓN DE PIEZAS</h3>
     </header>
     <section>
-        <div class="container p-5 my-5 border">
-            <!-- Crear Pieza -->
-            <form action="" method="post">
-                <div class="row">
-                    <div class="col">
-                        <label>Código</label>
-                        <input type="text" name="codigo" placeholder="F01" maxlength="3" />
-                    </div>
-                    <div class="col">
-                        <label>Clase</label>
-                        <select name="clase" class="form-select">
-                            <option>Refrigeración</option>
-                            <option>Filtro</option>
-                            <option>Motor</option>
-                            <option>Otros</option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label>Descripción</label>
-                        <input type="text" name="desc" placeholder="Nombre pieza" />
-                    </div>
-                    <div class="col">
-                        <label>Precio</label>
-                        <input type="number" name="precio" step="0.01" />
-                    </div>
-                    <div class="col">
-                        <label>Stock</label>
-                        <input type="number" name="stock" />
-                    </div>
-                    <div class="col">
-                        <input type="submit" name="crear" value="Crear" class="btn btn-outline-dark" />
-                        <input type="reset" name="limpiar" value="Cancelar" class="btn btn-outline-dark" />
-                    </div>
-                </div>
-            </form>
-        </div>
+        <!-- Crear Pieza -->
+        <?php include_once 'crearPieza.php' ?>
     </section>
     <section>
 
         <!-- Comunicar mensajes -->
-        <?php
-        if (isset($mensaje)) {
-            echo '<div class="container p-5 my-5 border">';
-            if ($mensaje[0] == 'e')
-                echo '<h4 class="text-danger">' . $mensaje[1] . '</h4>';
-            else
-                echo '<h4 class="text-success">' . $mensaje[1] . '</h4>';
-            echo '</div>';
-        }
-        ?>
+        <?php include_once '../verMensaje.php' ?>
     </section>
     <section>
-        <div class="container p-5 my-5 border">
-            <!-- Mostrar piezas y dar opción a modificar y borrar -->
-            <?php
-            if ($bd->getConexion() != null) {
-                //Obtener piezas
-                $piezas = $bd->obtenerPiezas();
-                //Mostramos las piezas en una tabla
-            ?>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Clase</th>
-                            <th>Descrición</th>
-                            <th>Precio</th>
-                            <th>Stock</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        foreach ($piezas as $p) {
-                            echo '<tr>';
-                            echo '<td>' . $p->getCodigo() . '</td>';
-                            echo '<td>' . $p->getClase() . '</td>';
-                            echo '<td>' . $p->getDescripcion() . '</td>';
-                            echo '<td>' . $p->getPrecio() . '</td>';
-                            echo '<td>' . $p->getStock() . '</td>';
-                            echo '<td>';
-                            echo '<button class="btn btn-outline-dark" name="" value="">Modificar</button>';
-                            echo '<button class="btn btn-outline-dark" name="" value="">Borrar</button>';
-                            echo '</td>';
-
-                            echo '</tr>';
-                        }
-                        ?>
-                    </tbody>
-                </table>
-            <?php
-            }
-            ?>
-        </div>
-
+        <?php include_once 'listarPiezas.php' ?>
     </section>
     <footer>
 

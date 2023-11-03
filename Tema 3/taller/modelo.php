@@ -83,6 +83,61 @@ class Modelo
         }
         return $resultado;
     }
+    function borrarPieza(string $codigo)
+    {
+        $resultado = false;
+        try {
+            $consulta = $this->conexion->prepare("delete from pieza where codigo=?");
+            $params = array($codigo);
+            if ($consulta->execute($params)) {
+                //Comprobar si se ha borrado al menos 1 registro
+                //En ese caso, ponemos resultado=true
+                //rowCount devuelve el nº de registros borrados
+                if ($consulta->rowCount() == 1) {
+                    $resultado = true;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+    function existenReparaciones(string $codigo)
+    {
+        $resultado = false;
+        try {
+            $consulta = $this->conexion->prepare("select * from piezareparacion where pieza=?");
+            $params = array($codigo);
+            if ($consulta->execute($params)) {
+                if ($consulta->fetch()) {
+                    $resultado = true;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function modificarPieza(Pieza $p, string $codigoAntiguo)
+    {
+        $resultado = false;
+        try {
+            $consulta = $this->conexion->prepare("update pieza set codigo=?, clase=?, descripcion=?, precio=?, stock=? where codigo =?");
+            $params = array(
+                $p->getCodigo(), $p->getClase(), $p->getDescripcion(),
+                $p->getPrecio(), $p->getStock(), $codigoAntiguo
+            );
+            if ($consulta->execute($params)) {
+                if ($consulta->rowCount() == 1) {
+                    $resultado = true;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
 
     /**
      * Get the value of conexion
