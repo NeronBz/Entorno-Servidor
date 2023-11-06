@@ -1,5 +1,7 @@
 <?php
 require_once '../Pieza/Pieza.php';
+require_once '../Usuario/Usuario.php';
+
 class Modelo
 {
     private $conexion;
@@ -131,6 +133,25 @@ class Modelo
             if ($consulta->execute($params)) {
                 if ($consulta->rowCount() == 1) {
                     $resultado = true;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function obtenerUsuario(string $us, string $ps)
+    {
+        $resultado = null;
+        try {
+            $consulta = $this->conexion->prepare('select * from usuarios where dni=? and ps=sha2(?,512)');
+            $params = array($us, $ps);
+            if ($consulta->execute($params)) {
+                //Ver si se ha devuelto 1 registro con el usuario
+                if ($fila = $consulta->fetch()) {
+                    //Se ha encontrado el usuario
+                    $resultado = new Usuario($fila['id'], $fila['dni'], $fila['nombre'], $fila['perfil']);
                 }
             }
         } catch (PDOException $e) {
