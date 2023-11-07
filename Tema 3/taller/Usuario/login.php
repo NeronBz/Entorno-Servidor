@@ -21,6 +21,9 @@ if (isset($_POST['login'])) {
             header('location:../Pieza/cPieza.php');
         }
     }
+} elseif (isset($_GET['accion']) and $_GET['accion'] == 'cerrar') {
+    session_unset();
+    session_destroy();
 }
 ?>
 <!DOCTYPE html>
@@ -33,14 +36,14 @@ if (isset($_POST['login'])) {
     <title>Login</title>
     <style>
         body {
-            margin: 0 auto;
             text-align: center;
         }
     </style>
 </head>
 
 <body>
-    <div class="container-md pt-5 border">
+    <h1>Taller mecánico</h1>
+    <div class="container-md p-4 border w-25">
         <!-- Login -->
         <h1>Login</h1>
         <form action="" method="post">

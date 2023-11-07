@@ -141,6 +141,21 @@ class Modelo
         return $resultado;
     }
 
+    function obtenerUsuarios()
+    {
+        $resultado = array();
+        try {
+            $datos = $this->conexion->query("select * from usuarios order by perfil, nombre");
+            while ($fila = $datos->fetch()) {
+                $u = new Usuario($fila['id'], $fila['dni'], $fila['nombre'], $fila['perfil']);
+                //Añadir a resultado
+                $resultado[] = $u;
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
     function obtenerUsuario(string $us, string $ps)
     {
         $resultado = null;
@@ -152,6 +167,44 @@ class Modelo
                 if ($fila = $consulta->fetch()) {
                     //Se ha encontrado el usuario
                     $resultado = new Usuario($fila['id'], $fila['dni'], $fila['nombre'], $fila['perfil']);
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function obtenerUsuarioDni(string $dni)
+    {
+        $resultado = null;
+        try {
+            $consulta = $this->conexion->prepare('select * from usuarios where dni=?');
+            $params = array($dni);
+            if ($consulta->execute($params)) {
+                //Ver si se ha devuelto 1 registro con el usuario
+                if ($fila = $consulta->fetch()) {
+                    //Se ha encontrado el usuario
+                    $resultado = new Usuario($fila['id'], $fila['dni'], $fila['nombre'], $fila['perfil']);
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function crearUsuario(Usuario $u)
+    {
+        $resultado = null;
+        try {
+            $consulta = $this->conexion->prepare('insert into usuarios values(default,?,?,sha2(?,512),?)');
+            $params = array($u->getDni(), $u->getNombre(), $u->getDni(), $u->getPerfil());
+            if ($consulta->execute($params)) {
+                if ($consulta->rowCount() == 1) {
+                    //Recuperar el autonumérico asignado en insert
+                    $u->setId($this->conexion->lastInsertId());
+                    $resultado = true;
                 }
             }
         } catch (PDOException $e) {
