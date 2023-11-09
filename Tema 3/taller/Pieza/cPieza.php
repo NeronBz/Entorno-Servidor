@@ -4,6 +4,13 @@ $bd = new Modelo();
 if ($bd->getConexion() == null) {
     $mensaje = array('e', 'Error, no hay conexión con la bd');
 } else {
+    //Chequear el perfil del usuario
+    session_start();
+    if (isset($_SESSION['usuario']) and ($_SESSION['usuario']->getPerfil() != 'A' and $_SESSION['usuario']->getPerfil != 'M')) {
+        header('location:../Usuario/login.php');
+    }
+    //Cerrar sesión
+    session_write_close();
     //Botón Crear
     if (isset($_POST['crear'])) {
         //Comprobar que todos los datos estén rellenos
@@ -65,7 +72,7 @@ if ($bd->getConexion() == null) {
         $p = $bd->obtenerPieza($_POST['borrar']);
         if ($p != null) {
             //Comprobar que se puede borrar (si no se ha usado en ninguna reparación)
-            if ($bd->existenReparaciones($p->getCodigo())) {
+            if ($bd->existenReparacionesPieza($p->getCodigo())) {
                 $mensaje = array('e', 'No se puede borrar la pieza porque está actualmente en reparaciones');
             } else {
                 //Borrar la pieza

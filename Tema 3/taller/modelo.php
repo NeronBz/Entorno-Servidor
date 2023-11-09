@@ -104,12 +104,29 @@ class Modelo
         }
         return $resultado;
     }
-    function existenReparaciones(string $codigo)
+    function existenReparacionesPieza(string $codigo)
     {
         $resultado = false;
         try {
             $consulta = $this->conexion->prepare("select * from piezareparacion where pieza=?");
             $params = array($codigo);
+            if ($consulta->execute($params)) {
+                if ($consulta->fetch()) {
+                    $resultado = true;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function existenReparacionesUsuario(int $id)
+    {
+        $resultado = false;
+        try {
+            $consulta = $this->conexion->prepare("select * from reparacion where usuario=?");
+            $params = array($id);
             if ($consulta->execute($params)) {
                 if ($consulta->fetch()) {
                     $resultado = true;
@@ -186,6 +203,61 @@ class Modelo
                 if ($fila = $consulta->fetch()) {
                     //Se ha encontrado el usuario
                     $resultado = new Usuario($fila['id'], $fila['dni'], $fila['nombre'], $fila['perfil']);
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function obtenerUsuarioId(string $id)
+    {
+        $resultado = null;
+        try {
+            $consulta = $this->conexion->prepare('select * from usuarios where id=?');
+            $params = array($id);
+            if ($consulta->execute($params)) {
+                //Ver si se ha devuelto 1 registro con el usuario
+                if ($fila = $consulta->fetch()) {
+                    //Se ha encontrado el usuario
+                    $resultado = new Usuario($fila['id'], $fila['dni'], $fila['nombre'], $fila['perfil']);
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function modificarUsuario(Usuario $u)
+    {
+        $resultado = false;
+        try {
+            $consulta = $this->conexion->prepare(
+                "UPDATE usuarios set dni=?, nombre=?, perfil=? where id=?"
+            );
+            $params = array($u->getDni(), $u->getNombre(), $u->getPerfil(), $u->getId());
+            if ($consulta->execute($params)) {
+                if ($consulta->rowCount() == 1) {
+                    $resultado = true;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function borrarUsuario(int $id)
+    {
+        $resultado = false;
+        try {
+            $consulta = $this->conexion->prepare("delete from usuarios where id=?");
+            $params = array($id);
+            if ($consulta->execute($params)) {
+                if ($consulta->rowCount() == 1) {
+                    $resultado = true;
                 }
             }
         } catch (PDOException $e) {

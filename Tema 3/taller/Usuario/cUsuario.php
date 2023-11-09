@@ -4,6 +4,13 @@ $bd = new Modelo();
 if ($bd->getConexion() == null) {
     $mensaje = array('e', 'Error, no hay conexión con la bd');
 } else {
+    //Chequear el perfil del usuario
+    session_start();
+    if (isset($_SESSION['usuario']) and ($_SESSION['usuario']->getPerfil() != 'A')) {
+        header('location:../Usuario/login.php');
+    }
+    //Cerrar sesión
+    session_write_close();
     //Botón Crear
     if (isset($_POST['crear'])) {
         if (empty($_POST['dni']) or empty($_POST['nombre']) or empty($_POST['perfil'])) {
@@ -24,7 +31,56 @@ if ($bd->getConexion() == null) {
             }
         }
     } elseif (isset($_POST['update'])) {
+        //Modificar Usuario
+        //Comprobar que todos los datos estén rellenos
+        if (
+            empty($_POST['dni']) or empty($_POST['nombre']) or empty($_POST['perfil'])
+        ) {
+            $mensaje = array('e', 'Debes rellenar todos los campos');
+        } else {
+            //Comprobar que existe un usuario
+            $u = $bd->obtenerUsuarioId($_POST['update']);
+            if ($u != null) {
+                //Chequear que si se modifica el dni no existe el nuevo
+                if ($_POST['dni'] != $u->getDni()) {
+                    if ($bd->obtenerUsuarioDni($_POST['dni']) != null) {
+                        $existeDNI = true;
+                        $mensaje = array('e', 'Error, dni ya existe');
+                    }
+                }
+                if (!isset($existeDNI)) {
+                    //Cambiar datos del usuario por los del formulario
+                    //Todos menos el id
+                    $u->setDni($_POST['dni']);
+                    $u->setNombre($_POST['nombre']);
+                    $u->setPerfil($_POST['perfil']);
+                    if ($bd->modificarUsuario($u)) {
+                        $mensaje = array('i', 'Usuario modificado');
+                    } else {
+                        $mensaje = array('e', 'Error al modificar el usuario');
+                    }
+                }
+            } else {
+                $mensaje = array('e', 'Error, no existe el usuario');
+            }
+        }
     } elseif (isset($_POST['borrar'])) {
+        //Chequear que el usuario ya existe
+        $u = $bd->obtenerUsuarioId($_POST['borrar']);
+        if ($u != null) {
+            //Chequear que no tiene reparaciones creadas por él
+            if ($bd->existenReparacionesUsuario($u->getId())) {
+                $mensaje = array('e', 'No se puede borrar el usuario porque hay reparaciones creadas por el usuario');
+            } else {
+                if ($bd->borrarUsuario($u->getId())) {
+                    $mensaje = array('i', 'Usuario borrado');
+                } else {
+                    $mensaje = array('e', 'Error al borrar el usuario');
+                }
+            }
+        } else {
+            $mensaje = array('e', 'No existe el usuario');
+        }
     }
 }
 ?>
