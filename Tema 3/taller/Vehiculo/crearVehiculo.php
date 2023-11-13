@@ -25,20 +25,18 @@
                     }
                     ?>
                 </select>
-                <button name="crearP" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#crearPropietario"></button>
+                <button type="button" name="crearP" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#crearPropietario">+</button>
             </div>
             <div class="col">
-                <input type="text" name="nombre" placeholder="Nombre Usuario" />
+                <input type="text" name="matricula" placeholder="1234ABC" pattern="[0-9]{4}[A-Z]{3}" />
             </div>
             <div class="col">
-                <select type="text" name="perfil" class="form-select form-select-sm">
-                    <option value="A">Administrador</option>
-                    <option value="M">Mecánico</option>
-                </select>
+                <input type="color" name="color">
             </div>
             <div class="col">
-                <input type="submit" name="crear" placeholder="Crear" class="btn btn-outline-dark" />
-                <input type="reset" name="limpiar" placeholder="Cancelar" class="btn btn-outline-dark" />
+                <input type="submit" name="crear" value="Crear" class="btn btn-outline-dark" />
+                <input type="submit" name="mostrarV" value="Vehículos" class="btn btn-outline-dark" />
+                <input type="reset" name="limpiar" value="Cancelar" class="btn btn-outline-dark" />
             </div>
         </div>
     </form>
@@ -58,7 +56,7 @@
                 <!-- Modal body -->
                 <div class="modal-body">
                     <label for="dni">DNI</label>
-                    <input id="dni" type="text" name="nombre" placeholder="1111111A">
+                    <input id="dni" type="text" name="dni" placeholder="1111111A">
                     <br>
                     <label for="nombre">Nombre</label>
                     <input id="nombre" type="text" name="nombre" placeholder="1111111A">
@@ -74,7 +72,8 @@
 
                 <!-- Modal footer -->
                 <div class="modal-footer">
-                    <button type="submit" name="insertarP" value="<?php echo $u->getId(); ?>" class="btn btn-danger" data-bs-dismiss="modal">Borrar</button>
+                    <button type="submit" name="insertarP" class="btn btn-success" data-bs-dismiss="modal">Crear</button>
+                    <button type="button" name="cancelar" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
                 </div>
             </form>
 

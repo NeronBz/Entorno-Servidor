@@ -13,15 +13,44 @@ if ($bd->getConexion() == null) {
     session_write_close();
     //Botón Crear
     if (isset($_POST['crear'])) {
-        if (false) {
+        if (empty($_POST['propietario']) or empty($_POST['matricula']) or empty($_POST['color'])) {
             $mensaje = array('e', 'Debe rellenar todos los campos');
         } else {
-           
+            //Comprobar que no hay otro vehículo con la misma matrícula
+            $v = $bd->obtenerVehiculo($_POST['matricula']);
+            if ($v == null) {
+                //Crear Vehiculo
+                $v = new Vehiculo(0, $_POST['propietario'], $_POST['matricula'], $_POST['color']);
+                if ($bd->crearVehiculo($v)) {
+                    $mensaje = array('i', 'Vehiculo creado');
+                } else {
+                    $mensaje = array('e', 'Se ha producido un error al crear el vehiculo');
+                }
+            } else {
+                $mensaje = array('e', 'Error, ya existe un vehiculo con esa matricula');
+            }
         }
-    } elseif (isset($_POST['update'])) {
-       
+    } elseif (isset($_POST['insertarP'])) {
+        if (empty($_POST['dni']) or empty($_POST['nombre']) or empty($_POST['telefono'])) {
+            $mensaje = array('e', 'Debe rellenar todos los campos');
+        } else {
+            //Comprobar que no hay otro propietario con el mismo dni
+            $p = $bd->obtenerPropietario($_POST['dni']);
+            if ($p == null) {
+                //Crear propietario
+                $p = new Propietario(0, $_POST['dni'], $_POST['nombre'], $_POST['telefono'], $_POST['email']);
+                if ($bd->crearPropietario($p)) {
+                    $mensaje = array('i', 'Propietario creado con código: ' . $p->getId());
+                } else {
+                    $mensaje = array('e', 'Se ha producido un error al crear el propietario');
+                }
+            } else {
+                $mensaje = array('e', 'Error, ya existe propietario con ese dni');
+            }
+        }
+    } elseif (isset($_POST['mostrarV'])) {
+        $vehiculos = $bd->obtenerVehiculos($_POST['propietario']);
     } elseif (isset($_POST['borrar'])) {
-       
     }
 }
 ?>
@@ -41,7 +70,7 @@ if ($bd->getConexion() == null) {
         <?php
         require_once '../menu.php';
         ?>
-        <h3 style="text-align: center;">GESTIÓN DE USUARIOS</h3>
+        <h3 style="text-align: center;">GESTIÓN DE VEHÍCULOS</h3>
     </header>
     <section>
         <!-- Crear Vehículo -->
@@ -54,7 +83,7 @@ if ($bd->getConexion() == null) {
     </section>
     <section>
         <!-- Seleccionar y visualizar datos de vehiculo -->
-        <?php include_once 'datosVehiculo.php' ?>
+        <?php include_once 'datosVehiculos.php' ?>
     </section>
     <section>
         <!-- Seleccionar y visualizar datos de reparación -->

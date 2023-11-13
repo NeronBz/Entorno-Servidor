@@ -2,6 +2,7 @@
 require_once '../Pieza/Pieza.php';
 require_once '../Usuario/Usuario.php';
 require_once '../Vehiculo/Propietario.php';
+require_once '../Vehiculo/Vehiculo.php';
 
 class Modelo
 {
@@ -294,6 +295,95 @@ class Modelo
             while ($fila = $datos->fetch()) {
                 $p = new Propietario($fila[0], $fila[1], $fila[2], $fila[3], $fila[4]);
                 $resultado[] = $p;
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function obtenerPropietario($dni)
+    {
+        $resultado = null;
+        try {
+            $consulta = $this->conexion->prepare('SELECT * from propietario where dni=?');
+            $params = array($dni);
+            if ($consulta->execute($params)) {
+                if ($fila = $consulta->fetch()) {
+                    $resultado = new Propietario($fila['codigo'], $fila['dni'], $fila['nombre'], $fila['telefono'], $fila['email']);
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function crearPropietario(Propietario $p)
+    {
+        $resultado = false;
+        try {
+            $consulta = $this->conexion->prepare('INSERT into propietario values(default, ?,?,?,?)');
+            $params = array($p->getDni(), $p->getNombre(), $p->getTelefono(), $p->getEmail());
+            if ($consulta->execute($params)) {
+                if ($consulta->rowCount() == 1) {
+                    $resultado = true;
+                    $p->setId($this->conexion->lastInsertId());
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function obtenerVehiculo($m)
+    {
+        $resultado = null;
+        try {
+            $consulta = $this->conexion->prepare('SELECT * from vehiculo where matricula=?');
+            $params = array($m);
+            if ($consulta->execute($params)) {
+                if ($fila = $consulta->fetch()) {
+                    $resultado = new Vehiculo($fila['codigo'], $fila['propietario'], $fila['matricula'], $fila['color']);
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function crearVehiculo(Vehiculo $v)
+    {
+        $resultado = false;
+        try {
+            $consulta = $this->conexion->prepare('INSERT into vehiculo values(default, ?,?,?)');
+            $params = array($v->getPropietario(), $v->getMatricula(), $v->getColor());
+            if ($consulta->execute($params)) {
+                if ($consulta->rowCount() == 1) {
+                    $resultado = true;
+                    $v->setCodigo($this->conexion->lastInsertId());
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function obtenerVehiculos($codigoP)
+    {
+        $resultado = null;
+        try {
+            $consulta = $this->conexion->prepare('SELECT * from vehiculo where propietario=?');
+            $params = array($codigoP);
+            if ($consulta->execute($params)) {
+                while ($fila = $consulta->fetch()) {
+                    $v = new Vehiculo($fila['codigo'], $fila['propietario'], $fila['matricula'], $fila['color']);
+                    //Añadir el vehículo al array resultado
+                    $resultado[] = $v;
+                }
             }
         } catch (PDOException $e) {
             echo $e->getMessage();
