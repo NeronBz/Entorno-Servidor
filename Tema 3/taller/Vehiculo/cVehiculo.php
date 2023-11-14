@@ -9,8 +9,6 @@ if ($bd->getConexion() == null) {
     if (isset($_SESSION['usuario']) and ($_SESSION['usuario']->getPerfil() == 'C')) {
         header('location:../Usuario/login.php');
     }
-    //Cerrar sesión
-    session_write_close();
     //Botón Crear
     if (isset($_POST['crear'])) {
         if (empty($_POST['propietario']) or empty($_POST['matricula']) or empty($_POST['color'])) {
@@ -49,9 +47,14 @@ if ($bd->getConexion() == null) {
             }
         }
     } elseif (isset($_POST['mostrarV'])) {
-        $vehiculos = $bd->obtenerVehiculos($_POST['propietario']);
+        //Crear una variable de sesión con el propietario
+        $_SESSION['propietario'] = $_POST['propietario'];
+    } elseif ($_POST['mostrarR']) {
+        $_SESSION['vehiculo'] = $_POST['mostrarR'];
     } elseif (isset($_POST['borrar'])) {
     }
+    //Cerrar sesión
+    session_write_close();
 }
 ?>
 <!DOCTYPE html>
@@ -87,7 +90,7 @@ if ($bd->getConexion() == null) {
     </section>
     <section>
         <!-- Seleccionar y visualizar datos de reparación -->
-        <?php include_once 'datosReparacion.php' ?>
+        <?php include_once '../Reparacion/datosReparaciones.php' ?>
     </section>
     <footer>
 
