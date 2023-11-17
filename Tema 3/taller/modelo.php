@@ -3,6 +3,7 @@ require_once '../Pieza/Pieza.php';
 require_once '../Usuario/Usuario.php';
 require_once '../Vehiculo/Propietario.php';
 require_once '../Vehiculo/Vehiculo.php';
+require_once '../Reparacion/Reparacion.php';
 
 class Modelo
 {
@@ -337,12 +338,12 @@ class Modelo
         return $resultado;
     }
 
-    function obtenerVehiculo($m)
+    function obtenerVehiculoId($id)
     {
         $resultado = null;
         try {
-            $consulta = $this->conexion->prepare('SELECT * from vehiculo where matricula=?');
-            $params = array($m);
+            $consulta = $this->conexion->prepare('SELECT * from vehiculo where codigo=?');
+            $params = array($id);
             if ($consulta->execute($params)) {
                 if ($fila = $consulta->fetch()) {
                     $resultado = new Vehiculo($fila['codigo'], $fila['propietario'], $fila['matricula'], $fila['color']);
@@ -383,6 +384,24 @@ class Modelo
                     $v = new Vehiculo($fila['codigo'], $fila['propietario'], $fila['matricula'], $fila['color']);
                     //Añadir el vehículo al array resultado
                     $resultado[] = $v;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function obtenerReparaciones($idV)
+    {
+        $resultado = array();
+        try {
+            $consulta = $this->conexion->prepare("select * from reparacion where coche=?");
+            $params = array($idV);
+            if ($consulta->execute($params)) {
+                while ($fila = $consulta->fetch()) {
+                    $r = new Reparacion($fila["id"], $fila["coche"], $fila["fechaHora"], $fila["tiempo"], $fila["precioH"], $fila["usuario"], $fila["pagado"]);
+                    $resultado[] = $r;
                 }
             }
         } catch (PDOException $e) {

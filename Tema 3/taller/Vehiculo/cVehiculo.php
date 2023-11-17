@@ -15,7 +15,7 @@ if ($bd->getConexion() == null) {
             $mensaje = array('e', 'Debe rellenar todos los campos');
         } else {
             //Comprobar que no hay otro vehículo con la misma matrícula
-            $v = $bd->obtenerVehiculo($_POST['matricula']);
+            $v = $bd->obtenerVehiculoId($_POST['matricula']);
             if ($v == null) {
                 //Crear Vehiculo
                 $v = new Vehiculo(0, $_POST['propietario'], $_POST['matricula'], $_POST['color']);
@@ -49,7 +49,7 @@ if ($bd->getConexion() == null) {
     } elseif (isset($_POST['mostrarV'])) {
         //Crear una variable de sesión con el propietario
         $_SESSION['propietario'] = $_POST['propietario'];
-    } elseif ($_POST['mostrarR']) {
+    } elseif (isset($_POST['mostrarR'])) {
         $_SESSION['vehiculo'] = $_POST['mostrarR'];
     } elseif (isset($_POST['borrar'])) {
     }
