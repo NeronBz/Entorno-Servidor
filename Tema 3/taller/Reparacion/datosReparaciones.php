@@ -6,6 +6,7 @@
         //Mostramos los vehículos en una tabla
     ?>
         <form action="" method="post">
+            <input type="submit" name="crearR" class="btn btn-outline-dark" value="+">
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -28,7 +29,7 @@
                             echo '<td> <input type="text" name="fecha" disabled="disabled" value="' . date('d/m/Y H:i', strtotime($r->getFecha())) . '"></td>';
                             echo '<td> <input type="number" name="horas" step="0.1" value="' . $r->getTiempo() . '"></td>';
                             echo '<td> <input type="checkbox" name="pagado" ' . ($r->getPagado() ? 'checked="checked"' : '') . '"></td>';
-                            echo '<td> <input type="text" name="usuario" disabled="disabled" value="' . $bd->obtenerUsuarioId($r->getUsuario())->getNombre . '"></td>';
+                            echo '<td> <input type="text" name="usuario" disabled="disabled" value="' . $bd->obtenerUsuarioId($r->getUsuario())->getNombre() . '"></td>';
                             echo '<td> <input type="number" name="precioH" step="0.1" value="' . $r->getPrecioH() . '"></td>';
 
                             echo '<td>';

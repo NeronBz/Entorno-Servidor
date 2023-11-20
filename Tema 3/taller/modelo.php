@@ -410,6 +410,24 @@ class Modelo
         return $resultado;
     }
 
+    function crearReparacion(Reparacion $r)
+    {
+        $resultado = false;
+        try {
+            $consulta = $this->conexion->prepare("insert into reparacion values 
+            (default,?,now(),0,false,?,0)");
+            $params = array($r->getCoche(), $r->getUsuario());
+            if ($consulta->execute($params)) {
+                if ($consulta->rowCount() == 1) {
+                    $resultado = true;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
     /**
      * Get the value of conexion
      */
