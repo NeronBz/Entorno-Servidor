@@ -23,7 +23,7 @@
                     <?php
                     foreach ($reparaciones as $r) {
                         echo '<tr>';
-                        if (isset($_POST['modif']) and $_POST['modif'] == $r->getId()) {
+                        if (isset($_POST['modifR']) and $_POST['modifR'] == $r->getId()) {
                             //Pintar campos para poder modificar
                             echo '<td> <input type="text" name="id" disabled="disabled" value="' . $r->getId() . '"></td>';
                             echo '<td> <input type="text" name="fecha" disabled="disabled" value="' . date('d/m/Y H:i', strtotime($r->getFecha())) . '"></td>';
@@ -33,7 +33,7 @@
                             echo '<td> <input type="number" name="precioH" step="0.1" value="' . $r->getPrecioH() . '"></td>';
 
                             echo '<td>';
-                            echo '<button type="submit" class="btn btn-outline-dark" name="update" value="' . $r->getId() . '">Guardar</button>';
+                            echo '<button type="submit" class="btn btn-outline-dark" name="updateR" value="' . $r->getId() . '">Guardar</button>';
                             echo '<button type="submit" class="btn btn-outline-dark" name="cancelar">Cancelar</button>';
                             echo '</td>';
                         } else {
@@ -44,9 +44,9 @@
                             echo '<td>' . $bd->obtenerUsuarioId($r->getUsuario())->getNombre() . '</td>';
                             echo '<td>' . $r->getPrecioH() . '</td>';
                             echo '<td>';
-                            echo '<button type="submit" class="btn btn-outline-dark" name="modif" value="' . $r->getId() . '"><img src="../img/modif25.png"/></button>';
+                            echo '<button type="submit" class="btn btn-outline-dark" name="modifR" value="' . $r->getId() . '"><img src="../img/modif25.png"/></button>';
                             echo '<button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#a' . $r->getId() . '" name="avisar" value="' . $r->getId() . '"><img src="../img/delete25.png"/></button>';
-                            echo '<button type="submit" class="btn btn-outline-dark" name="mostrarR" value="' . $r->getId() . '">Ver reparaciones</button>';
+                            echo '<button type="submit" class="btn btn-outline-dark" name="datosR" value="' . $r->getId() . '">Ver reparaciones</button>';
                             echo '</td>';
                         }
                         echo '</tr>';

@@ -49,8 +49,19 @@ if ($bd->getConexion() == null) {
     } elseif (isset($_POST['mostrarV'])) {
         //Crear una variable de sesión con el propietario
         $_SESSION['propietario'] = $_POST['propietario'];
+        unset($_SESSION['vehiculo']);
+        unset($_SESSION['reparacion']);
     } elseif (isset($_POST['mostrarR'])) {
         $_SESSION['vehiculo'] = $_POST['mostrarR'];
+    } elseif (isset($_POST['datosR'])) {
+        $_SESSION['reparacion'] = $_POST['datosR'];
+        header('location:../Reparacion/cReparacion.php');
+    } elseif (isset($_POST['updateR'])) {
+        if ($bd->modificarReparacion($_POST['updateR'], $_POST['horas'], (isset($_POST['pagado']) ? true : false), $_POST['precioH'])) {
+            $mensaje = array('i', 'Reparación modificada');
+        } else {
+            $mensaje = array('e', 'Error al modificar la reparación');
+        }
     } elseif (isset($_POST['borrar'])) {
     } elseif (isset($_POST['crearR'])) {
         //Crear reparación para vehículo en $_SESSION
@@ -97,7 +108,6 @@ if ($bd->getConexion() == null) {
         <?php include_once 'datosVehiculos.php' ?>
     </section>
     <section>
-        <?php include_once '../Reparacion/crearReparacion.php' ?>
         <!-- Seleccionar y visualizar datos de reparación -->
         <?php include_once '../Reparacion/datosReparaciones.php' ?>
     </section>

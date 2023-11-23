@@ -9,9 +9,9 @@ class Modelo
 {
     private $conexion;
 
-    const URL = 'mysql:host=127.0.0.1;port=3307;dbname=taller';
+    const URL = 'mysql:host=127.0.0.1;port=3306;dbname=taller';
     const USUARIO = 'root';
-    const PS = 'root';
+    const PS = '';
     function __construct()
     {
         try {
@@ -396,12 +396,37 @@ class Modelo
     {
         $resultado = array();
         try {
-            $consulta = $this->conexion->prepare("select * from reparacion where coche=?");
+            $consulta = $this->conexion->prepare("select * from reparacion where coche=? order by fechaHora desc");
             $params = array($idV);
             if ($consulta->execute($params)) {
                 while ($fila = $consulta->fetch()) {
                     $r = new Reparacion($fila["id"], $fila["coche"], $fila["fechaHora"], $fila["tiempo"], $fila["precioH"], $fila["usuario"], $fila["pagado"]);
                     $resultado[] = $r;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function obtenerReparacion($id)
+    {
+        $resultado = null;
+        try {
+            $consulta = $this->conexion->prepare("select * from reparacion where id=?");
+            $params = array($id);
+            if ($consulta->execute($params)) {
+                if ($fila = $consulta->fetch()) {
+                    $resultado = new Reparacion(
+                        $fila["id"],
+                        $fila["coche"],
+                        $fila["fechaHora"],
+                        $fila["tiempo"],
+                        $fila["precioH"],
+                        $fila["usuario"],
+                        $fila["pagado"]
+                    );
                 }
             }
         } catch (PDOException $e) {
@@ -420,12 +445,29 @@ class Modelo
             if ($consulta->execute($params)) {
                 if ($consulta->rowCount() == 1) {
                     $resultado = true;
+                    $r->setId($this->conexion->lastInsertId());
                 }
             }
         } catch (PDOException $e) {
             echo $e->getMessage();
         }
         return $resultado;
+    }
+
+    function modificarReparacion(int $id, float $horas, bool $pagado, float $precioH)
+    {
+        try {
+            $consulta = $this->conexion->prepare("update reparacion set tiempo=?, pagado=?, precioH=? where id=?");
+            $params = array($horas, $pagado, $precioH, $id);
+            if ($consulta->execute($params)) {
+                if ($consulta->rowCount() == 1) {
+                    return true;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return false;
     }
 
     /**
