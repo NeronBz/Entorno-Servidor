@@ -1,18 +1,27 @@
 <?php
-class Pieza{
+class Pieza
+{
     private string $codigo;
     private string $clase;
     private string $descripcion;
     private float $precio;
-    private int $stock; 
+    private int $stock;
     function __construct()
     {
-        
+    }
+
+    function rellenar($codigo, $clase, $descripcion, $precio, $stock)
+    {
+        $this->codigo = $codigo;
+        $this->clase = $clase;
+        $this->descripcion = $descripcion;
+        $this->precio = $precio;
+        $this->stock = $stock;
     }
 
     /**
      * Get the value of codigo
-     */ 
+     */
     public function getCodigo()
     {
         return $this->codigo;
@@ -22,7 +31,7 @@ class Pieza{
      * Set the value of codigo
      *
      * @return  self
-     */ 
+     */
     public function setCodigo($codigo)
     {
         $this->codigo = $codigo;
@@ -32,7 +41,7 @@ class Pieza{
 
     /**
      * Get the value of clase
-     */ 
+     */
     public function getClase()
     {
         return $this->clase;
@@ -42,7 +51,7 @@ class Pieza{
      * Set the value of clase
      *
      * @return  self
-     */ 
+     */
     public function setClase($clase)
     {
         $this->clase = $clase;
@@ -52,7 +61,7 @@ class Pieza{
 
     /**
      * Get the value of descripcion
-     */ 
+     */
     public function getDescripcion()
     {
         return $this->descripcion;
@@ -62,7 +71,7 @@ class Pieza{
      * Set the value of descripcion
      *
      * @return  self
-     */ 
+     */
     public function setDescripcion($descripcion)
     {
         $this->descripcion = $descripcion;
@@ -72,7 +81,7 @@ class Pieza{
 
     /**
      * Get the value of precio
-     */ 
+     */
     public function getPrecio()
     {
         return $this->precio;
@@ -82,7 +91,7 @@ class Pieza{
      * Set the value of precio
      *
      * @return  self
-     */ 
+     */
     public function setPrecio($precio)
     {
         $this->precio = $precio;
@@ -92,7 +101,7 @@ class Pieza{
 
     /**
      * Get the value of stock
-     */ 
+     */
     public function getStock()
     {
         return $this->stock;
@@ -102,7 +111,7 @@ class Pieza{
      * Set the value of stock
      *
      * @return  self
-     */ 
+     */
     public function setStock($stock)
     {
         $this->stock = $stock;

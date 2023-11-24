@@ -13,8 +13,33 @@ if ($bd->getConexion() == null) {
         header('location:../vehiculo/controllerVehiculo.php');
     }
     //Botón Crear
-    if (isset($_POST['crear'])) {
+    if (isset($_POST['crearPR'])) {
         //crear Pieza en reparación
+        //Chequear que estén rellenos la pieza y la cantidad y que no sean negativas
+        if (empty($_POST['pieza']) or empty($_POST['cantidad']) or $_POST['cantidad'] < 1) {
+            $mensaje = array("e", "Error, hay que rellenar todos los datos y la cantidad debe ser +");
+        } else {
+            //Chequear que haya stock
+            $pieza = $bd->obtenerPieza($_POST['pieza']);
+            if ($pieza->getStock() < $_POST['cantidad']) {
+                $mensaje = array("e", "Error, No hay stock suficiente");
+            } else {
+                //Si la pieza ya se ha usado en esa reparación
+                //hay que hacer un update e incrementar la cantidad
+                //Si no se ha usado, hay que hacer un insertar
+                $pr = $bd->obtenerPiezaReparacion($_SESSION['reparacion'], $pieza->getCodigo());
+                if ($pr == null) {
+                    //Insert
+                    if ($bd->insertarPR($_SESSION['reparacion'], $pieza, $_POST['cantidad'])) {
+                        $mensaje = array("i", "Pieza insertada");
+                    } else {
+                        $mensaje = array("e", "Error al insertar la pieza");
+                    }
+                } else {
+                    //Update
+                }
+            }
+        }
     } elseif (isset($_POST['update'])) {
         //Modificar pieza en reparación
     } elseif (isset($_POST['borrar'])) {
@@ -58,7 +83,7 @@ if ($bd->getConexion() == null) {
     </section>
     <section>
         <!-- Seleccionar y visualizar datos de vehiculo -->
-        <?php include_once 'datosPieza.php' ?>
+        <?php include_once 'datosPiezas.php' ?>
     </section>
     <footer>
 

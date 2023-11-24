@@ -11,13 +11,10 @@ function marcarOptionSeleccionado($option, $optionSeleccionado)
     <form action="" method="post">
         <div class="row">
             <div class="col">
-                <label>Propietario</label>
+                <label>Pieza</label>
             </div>
             <div class="col">
-                <label>Matrícula</label>
-            </div>
-            <div class="col">
-                <label>Color</label>
+                <label>Cantidad</label>
             </div>
             <div class="col">
             </div>
@@ -25,31 +22,21 @@ function marcarOptionSeleccionado($option, $optionSeleccionado)
         <div class="row">
             <div class="col">
                 <?php
-                $propietarios = $bd->obtenerPropietarios()
+                $piezas = $bd->obtenerPiezas()
                 ?>
-                <select name="propietario">
+                <select name="pieza">
                     <?php
-                    if (isset($_SESSION['propietario'])) {
-                        $pSele = $_SESSION['propietario'];
-                    } else {
-                        $pSele = "";
-                    }
-                    foreach ($propietarios as $p) {
-                        echo '<option value="' . $p->getId() . '"' . marcarOptionSeleccionado($p->getId(), $pSele) . '>' . $p->getDni() . '-' . $p->getNombre() . '</option>';
+                    foreach ($piezas as $p) {
+                        echo '<option value="' . $p->getCodigo() . '">' . $p->getClase() . '-' . $p->getDescripcion() . '</option>';
                     }
                     ?>
                 </select>
-                <button type="button" name="crearP" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#crearPropietario">+</button>
             </div>
             <div class="col">
-                <input type="text" name="matricula" placeholder="1234ABC" pattern="[0-9]{4}[A-Z]{3}" />
+                <input type="number" name="cantidad" value="1" />
             </div>
             <div class="col">
-                <input type="color" name="color">
-            </div>
-            <div class="col">
-                <input type="submit" name="crear" value="Crear" class="btn btn-outline-dark" />
-                <input type="submit" name="mostrarV" value="Vehículos" class="btn btn-outline-dark" />
+                <input type="submit" name="crearPR" value="Crear" class="btn btn-outline-dark" />
                 <input type="reset" name="limpiar" value="Cancelar" class="btn btn-outline-dark" />
             </div>
         </div>

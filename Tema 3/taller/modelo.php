@@ -4,6 +4,7 @@ require_once '../Usuario/Usuario.php';
 require_once '../Vehiculo/Propietario.php';
 require_once '../Vehiculo/Vehiculo.php';
 require_once '../Reparacion/Reparacion.php';
+require_once '../Reparacion/PiezaReparacion.php';
 
 class Modelo
 {
@@ -468,6 +469,76 @@ class Modelo
             echo $e->getMessage();
         }
         return false;
+    }
+
+    function obtenerPiezaReparacion($idRep, $codigoP)
+    {
+        $resultado = null;
+        try {
+            $consulta = $this->conexion->prepare(
+                'select * from piezareparacion as pr
+                inner join pieza p on pr.pieza=p.codigo
+                inner join reparacion r on pr.reparacion=p.id
+                where pr.reparacion=? and pr.pieza=?'
+            );
+            $params = array($idRep, $codigoP);
+            if ($consulta->execute($params)) {
+                if ($consulta->rowCount() == 1) {
+                    $fila = $consulta->fetch();
+                    $pieza = new Pieza();
+                    $pieza->rellenar($fila['codigo'], $fila['clase'], $fila['descripcion'], $fila['precio'], $fila['stock']);
+                    $resultado = new PiezaReparacion(
+                        new Reparacion($fila['id'], $fila['coche'], $fila['fechaHora'], $fila['tiempo'], $fila['pagado'], $fila['usuario'], $fila['precioH']),
+                        $pieza,
+                        $fila['cantidad'],
+                        $fila['precio']
+                    );
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function insertarPR($idR, $pieza, $cantidad)
+    {
+        $resultado = false;
+        try {
+            //Hay que hacer dos operaciones en la BD
+            //Un insert en piezareparacion
+            //Un update en pieza para actualizar el stock
+            //->HAY QUE HACER UNA TRANSACCION PARA GARANTIZAR
+            //QUE SIEMPRE SE HACEN LAS DOS OPERACIONES O NINGUNA SI HAY ERROR
+            //Iniciar transacción
+            $this->conexion->beginTransaction();
+            $consulta = $this->conexion->prepare('insert into piezareparacion values
+            (?,?,?,?)');
+            $params = array($idR, $pieza->getCodigo(), $pieza->getPrecio(), $cantidad);
+            if ($consulta->execute($params)) {
+                if ($consulta->rowCount() == 1) {
+                    //Actualizar el stock
+                    $consulta = $this->conexion->prepare('update into pieza set
+                    stock=stock-?
+                    where codigo=?');
+                    $params = array($cantidad, $pieza->getCodigo(), $pieza->getPrecio(), $cantidad);
+                    if ($consulta->execute($params)) {
+                        if ($consulta->rowCount() == 1) {
+                            $resultado = true;
+                            $this->conexion->commit();
+                        } else {
+                            $this->conexion->rollBack();
+                        }
+                    } else {
+                        $this->conexion->rollBack();
+                    }
+                }
+            }
+        } catch (PDOException $e) {
+            $this->conexion->rollBack();
+            echo $e->getMessage();
+        }
+        return $resultado;
     }
 
     /**
