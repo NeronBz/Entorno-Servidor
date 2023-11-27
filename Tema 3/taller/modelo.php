@@ -649,6 +649,26 @@ class Modelo
         return $resultado;
     }
 
+    function borrarPiezaReparacion(string $codigo)
+    {
+        $resultado = false;
+        try {
+            $consulta = $this->conexion->prepare("delete from piezareparacion where pieza=?");
+            $params = array($codigo);
+            if ($consulta->execute($params)) {
+                //Comprobar si se ha borrado al menos 1 registro
+                //En ese caso, ponemos resultado=true
+                //rowCount devuelve el nº de registros borrados
+                if ($consulta->rowCount() == 1) {
+                    $resultado = true;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
     /**
      * Get the value of conexion
      */

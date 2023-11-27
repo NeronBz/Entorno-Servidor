@@ -57,6 +57,18 @@ if ($bd->getConexion() == null) {
             $mensaje = array('e', 'Error, no existe la pieza en la reparación');
         }
     } elseif (isset($_POST['borrar'])) {
+        //Chequear que la pieza exista
+        $pr = $bd->obtenerPiezaReparacion($_SESSION['reparacion'], $_POST['borrar']);
+        if ($pr != null) {
+            //Borrar la pieza
+            if ($bd->borrarPiezaReparacion($pieza->getCodigo())) {
+                $mensaje = array('i', 'Pieza borrada');
+            } else {
+                $mensaje = array('e', 'Se ha producido un error al borrar la pieza');
+            }
+        } else {
+            $mensaje = array('e', 'Error, la pieza no existe');
+        }
     }
     //Cerrar sesión
     session_write_close();
