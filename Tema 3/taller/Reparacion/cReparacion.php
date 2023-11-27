@@ -10,7 +10,7 @@ if ($bd->getConexion() == null) {
         header('location:../Usuario/login.php');
     }
     if (!isset($_SESSION['reparacion'])) {
-        header('location:../vehiculo/controllerVehiculo.php');
+        header('location:../vehiculo/cVehiculo.php');
     }
     //Botón Crear
     if (isset($_POST['crearPR'])) {
@@ -37,11 +37,25 @@ if ($bd->getConexion() == null) {
                     }
                 } else {
                     //Update
+                    if ($bd->modificarPR($_SESSION['reparacion'], $pieza, $_POST['cantidad'])) {
+                        $mensaje = array("i", "Pieza modificada");
+                    } else {
+                        $mensaje = array("e", "Error al modificar la pieza");
+                    }
                 }
             }
         }
     } elseif (isset($_POST['update'])) {
         //Modificar pieza en reparación
+        //Obtener pieza a modificar
+        $pr = $bd->obtenerPiezaReparacion($_SESSION['reparacion'], $_POST['update']);
+        if ($pr != null) {
+            if ($bd->modificarCantidad($pr, $_POST['cantidad'])) {
+                $mensaje = array('i', 'Pieza modificada');
+            }
+        } else {
+            $mensaje = array('e', 'Error, no existe la pieza en la reparación');
+        }
     } elseif (isset($_POST['borrar'])) {
     }
     //Cerrar sesión
