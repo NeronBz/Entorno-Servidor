@@ -401,7 +401,7 @@ class Modelo
             $params = array($idV);
             if ($consulta->execute($params)) {
                 while ($fila = $consulta->fetch()) {
-                    $r = new Reparacion($fila["id"], $fila["coche"], $fila["fechaHora"], $fila["tiempo"], $fila["precioH"], $fila["usuario"], $fila["pagado"]);
+                    $r = new Reparacion($fila["id"], $fila["coche"], $fila["fechaHora"], $fila["tiempo"], $fila["precioH"], $fila["usuario"], $fila["pagado"], $fila['importeTotal']);
                     $resultado[] = $r;
                 }
             }
@@ -426,7 +426,8 @@ class Modelo
                         $fila["tiempo"],
                         $fila["precioH"],
                         $fila["usuario"],
-                        $fila["pagado"]
+                        $fila["pagado"],
+                        $fila["importeTotal"]
                     );
                 }
             }
@@ -441,7 +442,7 @@ class Modelo
         $resultado = false;
         try {
             $consulta = $this->conexion->prepare("insert into reparacion values 
-            (default,?,now(),0,false,?,0)");
+            (default,?,now(),0,false,?,0,0)");
             $params = array($r->getCoche(), $r->getUsuario());
             if ($consulta->execute($params)) {
                 if ($consulta->rowCount() == 1) {
@@ -488,7 +489,7 @@ class Modelo
                     $pieza = new Pieza();
                     $pieza->rellenar($fila['codigo'], $fila['clase'], $fila['descripcion'], $fila['precio'], $fila['stock']);
                     $resultado = new PiezaReparacion(
-                        new Reparacion($fila['id'], $fila['coche'], $fila['fechaHora'], $fila['tiempo'], $fila['precioH'], $fila['usuario'],  $fila['pagado']),
+                        new Reparacion($fila['id'], $fila['coche'], $fila['fechaHora'], $fila['tiempo'], $fila['precioH'], $fila['usuario'],  $fila['pagado'], $fila['importeTotal']),
                         $pieza,
                         $fila['cantidad'],
                         $fila['precio']
@@ -517,7 +518,7 @@ class Modelo
                     $pieza = new Pieza();
                     $pieza->rellenar($fila['codigo'], $fila['clase'], $fila['descripcion'], $fila['precio'], $fila['stock']);
                     $pr = new PiezaReparacion(
-                        new Reparacion($fila['id'], $fila['coche'], $fila['fechaHora'], $fila['tiempo'], $fila['precioH'], $fila['usuario'],  $fila['pagado']),
+                        new Reparacion($fila['id'], $fila['coche'], $fila['fechaHora'], $fila['tiempo'], $fila['precioH'], $fila['usuario'],  $fila['pagado'], $fila['importeTotal']),
                         $pieza,
                         $fila['cantidad'],
                         $fila['precio']
@@ -667,6 +668,24 @@ class Modelo
             echo $e->getMessage();
         }
         return $resultado;
+    }
+
+    function pagarR($idR)
+    {
+        $resultado = false;
+        try {
+            $consulta = $this->conexion->prepare("select pagarReparacion(?)as total");
+            $params = array($idR);
+            if ($fila = $consulta->fetch()) {
+                $resultado = true;
+                $total = $fila['total']; //Esta es la forma de recuperar lo que devuelve la función
+                if ($consulta->rowCount() == 1) {
+                    $resultado = true;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
     }
 
     /**

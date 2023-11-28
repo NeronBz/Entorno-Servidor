@@ -65,11 +65,17 @@ if ($bd->getConexion() == null) {
     } elseif (isset($_POST['borrar'])) {
     } elseif (isset($_POST['crearR'])) {
         //Crear reparación para vehículo en $_SESSION
-        $r = new Reparacion(0, $_SESSION['vehiculo'], time(), 0, false, $_SESSION['usuario']->getId(), 0);
+        $r = new Reparacion(0, $_SESSION['vehiculo'], time(), 0, false, $_SESSION['usuario']->getId(), 0, 0);
         if ($bd->crearReparacion($r)) {
             $mensaje = array('i', 'Reparación creada con código ' . $r->getId());
         } else {
             $mensaje = array('e', 'Se ha producido un error al crear la reparación');
+        }
+    } elseif (isset($_POST['pagarR'])) {
+        if ($bd->pagarR($_POST['pagarR'])) {
+            $mensaje = array('i', 'Reparación pagada' . $r->getId());
+        } else {
+            $mensaje = array('e', 'Se ha producido un error al pagar la reparación');
         }
     }
     //Cerrar sesión
