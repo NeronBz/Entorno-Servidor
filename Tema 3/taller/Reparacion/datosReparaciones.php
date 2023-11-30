@@ -51,6 +51,7 @@
                             echo '<button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#a' . $r->getId() . '" name="avisar" value="' . $r->getId() . '"><img src="../img/delete25.png"/></button>';
                             echo '<button type="submit" class="btn btn-outline-dark" name="datosR" value="' . $r->getId() . '">Ver reparaciones</button>';
                             echo '<button type="submit" class="btn btn-outline-dark" name="pagarR" value="' . $r->getId() . '">Pagar</button>';
+                            echo '<button type="submit" class="btn btn-outline-dark" name="enviarR" value="' . $r->getId() . '">Enviar</button>';
                             echo '</td>';
                         }
                         echo '</tr>';

@@ -681,11 +681,42 @@ class Modelo
                 $total = $fila['total']; //Esta es la forma de recuperar lo que devuelve la función
                 if ($consulta->rowCount() == 1) {
                     $resultado = true;
+                    $total = $fila['total']; //Esta es la forma de recuperar lo que devuelve la función
                 }
             }
         } catch (PDOException $e) {
             echo $e->getMessage();
         }
+        return $resultado;
+    }
+
+    function obtenerDetalleReparacion($idR)
+    {
+        $resultado = array();
+        try {
+            $consulta = $this->conexion->prepare('CALL generarFactura(?)');
+            $params = array($idR);
+            if ($consulta->execute($params)) {
+                //Recuperar el resultado del select de reparación
+                if ($fila = $consulta->fetch()) {
+                    $resultado[] = array(
+                        'Concepto' => $fila['descripcion'], 'Cantidad' => $fila['cantidad'],
+                        'Importe' => $fila['importe'], 'Total' => $fila['total']
+                    );
+                }
+                //Recuperar el resultado del select de piezareparacion
+                $consulta->nextRowset();
+                while ($fila = $consulta->fetch()) {
+                    $resultado[] = array(
+                        'Concepto' => $fila['descripcion'], 'Cantidad' => $fila['cantidad'],
+                        'Importe' => $fila['importe'], 'Total' => $fila['total']
+                    );
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
     }
 
     /**
