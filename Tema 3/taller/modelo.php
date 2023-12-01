@@ -321,6 +321,23 @@ class Modelo
         return $resultado;
     }
 
+    function obtenerPropietarioId($id)
+    {
+        $resultado = null;
+        try {
+            $consulta = $this->conexion->prepare('SELECT * from propietario where codigo=?');
+            $params = array($id);
+            if ($consulta->execute($params)) {
+                if ($fila = $consulta->fetch()) {
+                    $resultado = new Propietario($fila['codigo'], $fila['dni'], $fila['nombre'], $fila['telefono'], $fila['email']);
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
     function crearPropietario(Propietario $p)
     {
         $resultado = false;
@@ -676,10 +693,8 @@ class Modelo
         try {
             $consulta = $this->conexion->prepare("select pagarReparacion(?)as total");
             $params = array($idR);
-            if ($fila = $consulta->fetch()) {
-                $resultado = true;
-                $total = $fila['total']; //Esta es la forma de recuperar lo que devuelve la función
-                if ($consulta->rowCount() == 1) {
+            if ($consulta->execute($params)) {
+                if ($fila = $consulta->fetch()) {
                     $resultado = true;
                     $total = $fila['total']; //Esta es la forma de recuperar lo que devuelve la función
                 }
@@ -693,18 +708,18 @@ class Modelo
     function obtenerDetalleReparacion($idR)
     {
         $resultado = array();
+
         try {
             $consulta = $this->conexion->prepare('CALL generarFactura(?)');
-            $params = array($idR);
-            if ($consulta->execute($params)) {
-                //Recuperar el resultado del select de reparación
+            $param = array($idR);
+            if ($consulta->execute($param)) {
                 if ($fila = $consulta->fetch()) {
                     $resultado[] = array(
                         'Concepto' => $fila['descripcion'], 'Cantidad' => $fila['cantidad'],
                         'Importe' => $fila['importe'], 'Total' => $fila['total']
                     );
                 }
-                //Recuperar el resultado del select de piezareparacion
+
                 $consulta->nextRowset();
                 while ($fila = $consulta->fetch()) {
                     $resultado[] = array(
@@ -713,10 +728,59 @@ class Modelo
                     );
                 }
             }
+        } catch (PDOException $th) {
+            echo $th->getMessage();
+        }
+    }
+    function borrarReparacion(int $id)
+    {
+        $resultado = false;
+        try {
+            $consulta = $this->conexion->prepare("delete from reparacion where id = ?");
+            $params = array($id);
+            if ($consulta->execute($params)) {
+                if ($consulta->rowCount() == 1) {
+                    $resultado = true;
+                }
+            }
         } catch (PDOException $e) {
             echo $e->getMessage();
         }
         return $resultado;
+    }
+
+    function borrarVehiculo(int $codigo)
+    {
+        $resultado = false;
+        try {
+            $consulta = $this->conexion->prepare("delete from vehiculo where codigo = ?");
+            $params = array($codigo);
+            if ($consulta->execute($params)) {
+                if ($consulta->rowCount() == 1) {
+                    $resultado = true;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function modificarVehiculo(Vehiculo $v)
+    {
+        try {
+            $consulta = $this->conexion->prepare('update vehiculo set matricula=?,
+            color=? where codigo = ?');
+            $params = array($v->getMatricula(), $v->getColor(), $v->getCodigo());
+            if ($consulta->execute($params)) {
+                if ($consulta->rowCount() == 1) {
+                    return true;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return false;
     }
 
     /**

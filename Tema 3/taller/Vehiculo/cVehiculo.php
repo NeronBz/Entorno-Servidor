@@ -156,17 +156,21 @@ if ($bd->getConexion() == null) {
         }
     } elseif (isset($_POST['pagarR'])) {
         if ($bd->pagarR($_POST['pagarR'])) {
-            $mensaje = array('i', 'Reparación pagada ' . $r->getId());
+            $mensaje = array('i', 'Reparación pagada ');
         } else {
             $mensaje = array('e', 'Se ha producido un error al pagar la reparación');
         }
     } elseif (isset($_POST['enviarR'])) {
         $r = $bd->obtenerReparacion($_POST['enviarR']);
-        if ($r != null and $r->getPagado()) {
-            $detalle = $bd->obtenerDetalleReparacion($r->getId());
-            enviarCorreo($r, $detalle);
-        } else {
-            $mensaje = array('e', 'Reparación no existe o no está pagada');
+        $coche = $bd->obtenerVehiculoId($r->getCoche());
+        $propietario = $bd->obtenerPropietarioId($coche->getPropietario());
+        if ($propietario->getEmail() != null) {
+            if ($r != null and $r->getPagado()) {
+                $detalle = $bd->obtenerDetalleReparacion($r->getId());
+                enviarCorreo($bd, $r, $detalle, $propietario);
+            } else {
+                $mensaje = array('e', 'Reparación no existe o no está pagada');
+            }
         }
     }
     session_write_close();
