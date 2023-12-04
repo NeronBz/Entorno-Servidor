@@ -731,6 +731,7 @@ class Modelo
         } catch (PDOException $th) {
             echo $th->getMessage();
         }
+        return $resultado;
     }
     function borrarReparacion(int $id)
     {
