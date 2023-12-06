@@ -5,7 +5,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require_once '../../../vendor/autoload.php';
-//wpwxkioeuofepakd
+
 
 function enviarCorreo(Modelo $bd, $r, $detalle, $propietario)
 {
@@ -17,7 +17,7 @@ function enviarCorreo(Modelo $bd, $r, $detalle, $propietario)
         $correo->Host = 'smtp.gmail.com';
         $correo->SMTPAuth = true;
         $correo->Username = 'rblazquezi02@educarex.es';
-        $correo->Password = 'wpwxkioeuofepakd';
+        $correo->Password = '';
         $correo->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         $correo->Port = 465;
 
