@@ -1,3 +1,43 @@
+<?php
+require_once 'Modelo.php';
+$bd = new Modelo();
+if ($bd->getConexion() == null) {
+    $mensaje = 'Error, no hay conexión con la base de datos';
+}
+//Chequear si hay empleado en la sesión
+session_start();
+if (isset($_SESSION['usuario'])) {
+    //Hay empleado conectado
+    $empleado = $_SESSION['usuario'];
+} else {
+    //Redirigir a login
+    header('location:login.php');
+}
+if (isset($_POST['cerrar'])) {
+    session_destroy();
+    header('location:login.php');
+}
+if (isset($_POST['Enviar'])) {
+    if (empty($_POST['asunto']) or empty($_POST['mensaje'])) {
+        $mensaje = 'Error, rellena asunto y mensaje';
+    } else {
+        $m = new Mensaje(
+            0,
+            $empleado->getIdEmp(),
+            $_POST['para'],
+            $_POST['asunto'],
+            date('Y-m-d'),
+            $_POST['mensaje']
+        );
+        $destinatarios = $bd->obtenerEmpleadosDepartamentos($_POST['para']);
+        if ($bd->enviarMensaje($m, $destinatarios)) {
+            $mensaje = 'Mensaje enviado';
+        } else {
+            $mensaje = 'Error, mensaje no enviado';
+        }
+    }
+}
+?>
 <!doctype html>
 <html>
 
@@ -12,12 +52,26 @@
         <h1 style='color:red;'>Mensaje si es necesario</h1>
     </div>
     <form action="mensajes.php" method="post">
-        <h1 style="color:blue;">Nuevo Mensaje</h1>
-        <h2 style="color:blue;">Nombre y dni del empleado</h2>
+        <h1 style="color:blue;">
+            <?php echo isset($mensaje) ? $mensaje : ''; ?>
+        </h1>
+        <h2 style="color:blue;">
+            <?php
+            echo 'Nombre: ' . $empleado->getNombre() . ' - ' .
+                'DNI: ' . $empleado->getDni() . ' - Departamento: ' .
+                $empleado->getDepartamento()->getNombre();
+            ?>
+        </h2>
         <hr />
         <div>
             <label for="para">Para</label><br />
             <select id="para" name="para">
+                <?php
+                $departamentos = $bd->obtenerDepartamentos();
+                foreach ($departamentos as $d) {
+                    echo '<option value="' . $d->getIdDep() . '">' . $d->getNombre() . '</option>';
+                }
+                ?>
             </select>
         </div>
         <div>
