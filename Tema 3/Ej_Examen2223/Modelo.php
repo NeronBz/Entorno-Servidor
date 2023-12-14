@@ -19,6 +19,75 @@ class Modelo
         }
     }
 
+    function obtenerMensajesRecibidos($empleado)
+    {
+        $resultado = array();
+        try {
+            $consulta = $this->conexion->prepare('SELECT * from para as p 
+            inner join mensaje as m on p.idMen=m.idMen
+            inner join empleado as e on m.deEmpleado=e.idEmp
+            inner join departamento as d on m.paraDepartamento=d.idDep
+            where p.paraEmpleado=?');
+            $params = array($empleado->getIdEmp());
+            if ($consulta->execute($params)) {
+                while ($fila = $consulta->fetch()) {
+                    $m = new Mensaje(
+                        $fila['idMen'],
+                        new Empleado(
+                            $fila['idEmp'],
+                            $fila['dni'],
+                            $fila['nombreEmp'],
+                            $fila['fechaNac'],
+                            $fila['departamento'],
+                            $fila['cambiarPs']
+                        ),
+                        new Departamento(
+                            $fila['paraDepartamento'],
+                            $fila['nombre']
+                        ),
+                        $fila['asunto'],
+                        $fila['fechaEnvio'],
+                        $fila['mensaje']
+                    );
+                    $resultado[] = $m;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function obtenerMensajes($empleado)
+    {
+        $resultado = array();
+        try {
+            $consulta = $this->conexion->prepare('SELECT * from mensaje 
+           inner join departamento on paraDepartamento=idDep
+           where deEmpleado=? order by fechaEnvio desc');
+            $params = array($empleado->getIdEmp());
+            if ($consulta->execute($params)) {
+                while ($fila = $consulta->fetch()) {
+                    $m = new Mensaje(
+                        $fila['idMen'],
+                        $empleado,
+                        new Departamento(
+                            $fila['paraDepartamento'],
+                            $fila['nombre']
+                        ),
+                        $fila['asunto'],
+                        $fila['fechaEnvio'],
+                        $fila['mensaje']
+                    );
+                    $resultado[] = $m;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
     function enviarMensaje(Mensaje $m, $destinatarios)
     {
         $resultado = false;
@@ -32,11 +101,21 @@ class Modelo
             );
             if ($consulta->execute($params)) {
                 //Recuperar el id del mensaje generado
+                $idMensaje = $this->conexion->lastInsertId();
                 //Hacer un insert en "para" para cada destinatario
                 foreach ($destinatarios as $d) {
-                    $consulta = $this->conexion->prepare('INSERT into para values (default, ?,?,false)');
-                    $params = array(, $d->getIdEmp());
+                    $consulta = $this->conexion->prepare('INSERT into para values (?,?,false)');
+                    $params = array($idMensaje, $d->getIdEmp());
+                    if ($consulta->execute($params)) {
+                        if ($consulta->rowCount() != 1) {
+                            $this->conexion->rollBack();
+                        }
+                    } else {
+                        $this->conexion->rollBack();
+                    }
                 }
+                $this->conexion->commit();
+                $resultado = $idMensaje;
             }
         } catch (PDOException $e) {
             $this->conexion->rollBack();
@@ -49,7 +128,7 @@ class Modelo
     {
         $resultado = array();
         try {
-            $consulta = $this->conexion->prepare('SELECT * from empleado wher departamento=?');
+            $consulta = $this->conexion->prepare('SELECT * from empleado where departamento=?');
             $params = array($idDep);
             if ($consulta->execute($params)) {
                 while ($fila = $consulta->fetch()) {
@@ -59,7 +138,7 @@ class Modelo
                         $fila['nombreEmp'],
                         $fila['fechaNac'],
                         $fila['departamento'],
-                        $fila['cambiarPS']
+                        $fila['cambiarPs']
                     );
                 }
             }

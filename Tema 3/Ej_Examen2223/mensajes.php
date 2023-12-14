@@ -30,8 +30,9 @@ if (isset($_POST['Enviar'])) {
             $_POST['mensaje']
         );
         $destinatarios = $bd->obtenerEmpleadosDepartamentos($_POST['para']);
-        if ($bd->enviarMensaje($m, $destinatarios)) {
-            $mensaje = 'Mensaje enviado';
+        $id = $bd->enviarMensaje($m, $destinatarios);
+        if ($id != 0) {
+            $mensaje = 'Mensaje nº ' . $id . ' enviado';
         } else {
             $mensaje = 'Error, mensaje no enviado';
         }
@@ -48,9 +49,6 @@ if (isset($_POST['Enviar'])) {
 
 <body>
 
-    <div>
-        <h1 style='color:red;'>Mensaje si es necesario</h1>
-    </div>
     <form action="mensajes.php" method="post">
         <h1 style="color:blue;">
             <?php echo isset($mensaje) ? $mensaje : ''; ?>
@@ -96,6 +94,21 @@ if (isset($_POST['Enviar'])) {
                 <th align="left">Asunto</th>
                 <th align="left">Mensaje</th>
             </tr>
+            <?php
+            $mensajesRecibidos = $bd->obtenerMensajesRecibidos($empleado);
+            foreach ($mensajesRecibidos as $m) {
+                echo '<tr>';
+                echo '<th align="left">' . $m->getIdMen() . '</th>';
+                echo '<th align="left">' . $m->getDeEmpleado()->getNombre() . '</th>';
+                echo '<th align="left">' . $m->getParaDepartamento()->getNombre() . '</th>';
+                echo '<th align="left">' .
+                    date('d/m/Y', strtotime($m->getFechaEnvio()))
+                    . '</th>';
+                echo '<th align="left">' . $m->getAsunto() . '</th>';
+                echo '<th align="left">' . $m->getMensaje() . '</th>';
+                echo '</tr>';
+            }
+            ?>
         </table>
         <h1 style="color:blue;">Bandeja de Salida</h1>
         <hr />
@@ -107,6 +120,20 @@ if (isset($_POST['Enviar'])) {
                 <th align="left">Asunto</th>
                 <th align="left">Mensaje</th>
             </tr>
+            <?php
+            $mensaje = $bd->obtenerMensajes($empleado);
+            foreach ($mensaje as $m) {
+                echo '<tr>';
+                echo '<th align="left">' . $m->getIdMen() . '</th>';
+                echo '<th align="left">' . $m->getParaDepartamento()->getNombre() . '</th>';
+                echo '<th align="left">' .
+                    date('d/m/Y', strtotime($m->getFechaEnvio()))
+                    . '</th>';
+                echo '<th align="left">' . $m->getAsunto() . '</th>';
+                echo '<th align="left">' . $m->getMensaje() . '</th>';
+                echo '</tr>';
+            }
+            ?>
         </table>
     </form>
 
