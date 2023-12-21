@@ -1,14 +1,12 @@
 <?php
+require_once 'Tienda.php';
 require_once 'Producto.php';
 require_once 'ProductoEnCesta.php';
-require_once 'Tienda.php';
-
 class Modelo
 {
-    private string $url = 'mysql:host=localhost;port=3306;dbname=mcdaw';
-    private string $us = 'root';
-    private string $ps = '';
-
+    private $url = "mysql:host=localhost;port=3306;dbname=mcdaw";
+    private $us = "root";
+    private $ps = "";
     private $conexion = null;
 
     function __construct()
@@ -20,17 +18,99 @@ class Modelo
         }
     }
 
-    function mensaje(){
-        
+    function borrarPedido($codigoProducto)
+    {
+        $resultado = false;
+        try {
+            
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
     }
-
-    function obtenerProductosyPrecio()
+    function obtenerInfoPedido($codigoPedido)
     {
         $resultado = array();
         try {
-            $consulta = $this->conexion->query('select * from producto order by nombre');
-            while ($fila = $consulta->fetch()) {
-                $resultado[] = new Producto($fila['codigo'], $fila['nombre'], $fila['precio']);
+            $consulta =
+                $this->conexion->prepare('call datosPedido(?)');
+            $params = array($codigoPedido);
+            if ($consulta->execute($params)) {
+                if ($fila = $consulta->fetch()) {
+                    $resultado[] = $fila['numProd'];
+                    $resultado[] = $fila['total'];
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+    function crearPedido($tienda, $cesta)
+    {
+        $resultado = 0;
+        try {
+            //Iniciar transacción
+            $this->conexion->beginTransaction();
+            //Crear pedidio
+            $consulta = $this->conexion->prepare(
+                'INSERT into pedido values(default,curdate(),?)'
+            );
+            $params = array($tienda->getCodigo());
+            if ($consulta->execute($params)) {
+                //REcuperar el id del pedido generado
+                $idP = $this->conexion->lastInsertId();
+                //Inserts de productos en cesta
+                $linea = 0;
+                foreach ($cesta as $pc) {
+                    $consulta = $this->conexion->prepare(
+                        'INSERT into detalle values(?,?,?,?,?)'
+                    );
+                    $params = array(
+                        ++$linea, $idP, $pc->getProducto()->getCodigo(),
+                        $pc->getCantidad(), $pc->getProducto()->getPrecio()
+                    );
+                    if (!$consulta->execute($params)) {
+                        $this->conexion->rollBack();
+                        return 0;
+                    }
+                }
+                $this->conexion->commit();
+                $resultado = $idP;
+            } else {
+                $this->conexion->rollBack();
+            }
+        } catch (PDOException $e) {
+            $this->conexion->rollBack();
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+    function obtenerProducto($codigo)
+    {
+        $resultado = null;
+        try {
+            $consulta = $this->conexion->prepare("select * from producto where codigo = ?");
+            $params = array($codigo);
+            if ($consulta->execute($params)) {
+                if ($fila = $consulta->fetch()) {
+                    $resultado = new Producto($fila['codigo'], $fila['nombre'], $fila['precio']);
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+    function obtenerProductos()
+    {
+        $resultado = array();
+        try {
+            $consulta = $this->conexion->query("select * from producto");
+            if ($consulta->execute()) {
+                while ($fila = $consulta->fetch()) {
+                    $resultado[] = new Producto($fila['codigo'], $fila['nombre'], $fila['precio']);
+                }
             }
         } catch (PDOException $e) {
             echo $e->getMessage();
@@ -38,13 +118,32 @@ class Modelo
         return $resultado;
     }
 
+    function obtenerTienda($codigo)
+    {
+        $resultado = null;
+        try {
+            $consulta = $this->conexion->prepare("select * from tienda where codigo = ?");
+            $params = array($codigo);
+            if ($consulta->execute($params)) {
+                if ($fila = $consulta->fetch()) {
+                    $resultado = new Tienda($fila['codigo'], $fila['nombre'], $fila['telefono']);
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
     function obtenerTiendas()
     {
         $resultado = array();
         try {
-            $consulta = $this->conexion->query('select * from tienda order by nombre');
-            while ($fila = $consulta->fetch()) {
-                $resultado[] = new Tienda($fila['codigo'], $fila['nombre'], $fila['telefono']);
+            $consulta = $this->conexion->query("select * from tienda");
+            if ($consulta->execute()) {
+                while ($fila = $consulta->fetch()) {
+                    $tienda = new Tienda($fila['codigo'], $fila['nombre'], $fila['telefono']);
+                    $resultado[] = $tienda;
+                }
             }
         } catch (PDOException $e) {
             echo $e->getMessage();

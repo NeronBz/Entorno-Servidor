@@ -1,8 +1,60 @@
 <?php
 require_once 'Modelo.php';
+
+$bd = new Modelo();
+if ($bd->getConexion() == null) {
+    $mensaje = "Error, no hay conexión con la bd";
+} else {
+    session_start();
+    if (isset($_POST['selTienda'])) {
+        //Almacenar tienda en sesión
+        $tienda = $bd->obtenerTienda($_POST['tienda']);
+        if ($tienda != null)
+            $_SESSION['tienda'] = $tienda;
+        else
+            $mensaje = 'Error, tienda seleccionada no existe';
+    } elseif (isset($_POST['cambiar'])) {
+        session_destroy();
+        header('location:mcDaw.php');
+    } elseif (isset($_POST['agregar'])) {
+        if ($_POST['cantidad'] <= 0) {
+            $mensaje = 'Error, cantidad debe ser mayor que 0';
+        } else {
+            //Obtener todos los datos del producto seleccionado
+            $producto = $bd->obtenerProducto($_POST['producto']);
+            if ($producto != null) {
+                //Añadir a cesta
+                if($_SESSION['cesta'])
+                $proCesta = new ProductoEnCesta($producto, $_POST['cantidad']);
+                if (!isset($_SESSION['cesta'])) {
+                    $_SESSION['cesta'] = array();
+                }
+                $_SESSION['cesta'][] = $proCesta;
+            } else {
+                $mensaje = 'Error, producto no existe';
+            }
+        }
+    } elseif (isset($_POST['crearPedido'])) {
+        if (isset($_SESSION['cesta']) and !empty($_SESSION['cesta'])) {
+            $codigoPedido = $bd->crearPedido($_SESSION['tienda'], $_SESSION['cesta']);
+            if ($codigoPedido > 0) {
+                $mensaje = 'Pedido Creado';
+                unset($_SESSION['cesta']);
+                $datos = $bd->obtenerInfoPedido($codigoPedido);
+                $mensaje = 'Pedidio nº ' . $codigoPedido . ' generado. El nº de productos es' .
+                    $datos[0] . ' y el importe total es ' . $datos[1];
+            } else {
+                $mensaje = 'Error al crear el pedido';
+            }
+        } else {
+            $mensaje = 'Error, cesta vacía';
+        }
+    } elseif (isset($_POST['borrar'])) {
+        unset($_SESSION['cesta'][$_POST['borrar']]);
+        array_values($_SESSION['cesta']);
+    }
+}
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,121 +65,89 @@ require_once 'Modelo.php';
 </head>
 
 <body>
-    <?php
-    session_start();
-    $bd = new Modelo();
-    if ($bd->getConexion() == null) {
-        $mensaje = "Error, no hay conexión";
-    } else {
-        $tiendas = $bd->obtenerTiendas();
-        $productos_precio = $bd->obtenerProductosyPrecio();
-        if (isset($_POST['tienda'])) {
-            $_SESSION['tienda'] = $tienda;
-        }
-        if (isset($_POST['cambiar'])) {
-            session_unset();
-            header('location:mcDaw.php');
-        }
-        if (isset($_POST['agregar'])) {
-            if (isset($_POST['cantidad']) <= 0) {
-                $mensaje = 'La cantidad del producto 
-                seleccionado tiene que ser mayor que 0';
-            } else {
-                $productoCesta = new ProductoEnCesta($_POST['producto'], $_POST['cantidad']);
-                if (isset($_SESSION['cesta'])) {
-                    $cesta = $_SESSION['cesta'];
-                } else {
-                    $cesta = array();
-                }
-                $cesta[] = $productoCesta;
-                $_SESSION['cesta'] = $cesta;
-            }
-        }
-        if (isset($_POST['crearPedido'])) {
-            if ($contenido_cesta == null) {
-                $mensaje = 'No hay contenido en la cesta';
-            } else {
-                if ($bd->crearPedido($_SESSION['tienda'], $_SESSION['producto'])) {
-                    session_destroy($cesta);
-                    $mensaje='Pedido nº'
-                }
-            }
-        }
-    }
-    ?>
     <div>
-        <h1 style='color:red;'>
-            <?php echo isset($mensaje) ? $mensaje : ''; ?>
-        </h1>
+        <h1 style='color:red;'><?php echo isset($mensaje) ? $mensaje : ""; ?></h1>
     </div>
     <form action="mcDaw.php" method="post">
-        <div>
-            <?php
-            if (!isset($_POST['selTienda'])) {
-            ?>
+        <?php
+
+        if (!isset($_SESSION['tienda'])) {
+        ?>
+            <div>
                 <h1 style='color:blue;'>Tienda</h1>
                 <label for="tienda">Tienda</label><br />
                 <select name="tienda">
                     <?php
+                    $tiendas = $bd->obtenerTiendas();
                     foreach ($tiendas as $t) {
-                        echo "<option value='" . $t->getCodigo() . "'" . ">" . $t->getNombre() . "</option>";
+                        echo '<option value="' . $t->getCodigo() . '">' . $t->getNombre() . '</option>';
                     }
                     ?>
                 </select>
                 <button type="submit" name="selTienda">Seleccionar tienda</button>
-        </div>
-    <?php
-            } elseif (isset($_POST['selTienda'])) {
-    ?>
-        <div>
-            <h1 style='color:blue;'>Añade productos a la cesta</h1>
-            <h2 style='color:green;'>Datos Tienda: Nombre - Teléfono
-                <button type="submit" name="cambiar">Cambiar Tienda</button>
-            </h2>
-            <table>
-                <tr>
-                    <td><label for="producto">Producto</label><br /></td>
-                    <td><label for="cantidad">Cantidad</label><br /></td>
-                    <td>Añadir a la cesta</td>
-                </tr>
-                <tr>
-                    <td>
-                        <select id="producto" name="producto">
-                            <?php
-                            foreach ($productos_precio as $pp) {
-                                echo "<option value='" . $pp->getCodigo() . "'" . ">" . $pp->getNombre() . " - " . $pp->getPrecio() . "</option>";
-                            }
-                            ?>
-                        </select>
-                    </td>
-                    <td><input id="cantidad" type="number" name="cantidad" value="1" /></td>
-                    <td><button type="submit" name="agregar">+</button></td>
-                </tr>
-            </table>
-        </div>
-        <div>
-            <h1 style='color:blue;'>Contenido de la cesta</h1>
-            <table border="1" rules="all" width="25%">
-                <tr>
-                    <td><b>Producto</b></td>
-                    <td><b>Cantidad</b></td>
-                    <td><b>Precio</b></td>
-                </tr>
-
+            </div>
+        <?php
+        } else {
+        ?>
+            <div>
+                <h1 style='color:blue;'>Añade productos a la cesta</h1>
                 <?php
-                foreach ($cesta as $c) {
-                    echo '<tr>';
-                    echo '<td align="left">' . $c[0] . '</td>';
-                    echo '<td align="left">' . $c[1] . '</td>';
-                    echo '<td align="left">' . $c[2] . '</td>';
-                }
+                $t = $_SESSION['tienda'];
                 ?>
-            </table>
-            <button type="submit" name="crearPedido">Crear Pedido</button>
-        </div>
-    <?php
-            }
-    ?>
+                <h2 style='color:green;'>Datos Tienda:
+                    <?php echo $t->getNombre(), '-', $t->getTelefono(); ?>
+                    <button type="submit" name="cambiar">Cambiar Tienda</button>
+                </h2>
+                <table>
+                    <tr>
+                        <td><label for="producto">Producto</label><br /></td>
+                        <td><label for="cantidad">Cantidad</label><br /></td>
+                        <td>Añadir a la cesta</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <select id="producto" name="producto">
+                                <?php
+                                $productos = $bd->obtenerProductos();
+                                foreach ($productos as $p) {
+                                    echo '<option value="' . $p->getCodigo() . '">' . $p->getNombre() .
+                                        '-' . $p->getPrecio() . '</option>';
+                                }
+                                ?>
+                            </select>
+                        </td>
+                        <td><input id="cantidad" type="number" name="cantidad" value="1" /></td>
+                        <td><button type="submit" name="agregar">+</button></td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                <h1 style='color:blue;'>Contenido de la cesta</h1>
+                <table border="1" rules="all" width="25%">
+                    <tr>
+                        <td><b>Producto</b></td>
+                        <td><b>Cantidad</b></td>
+                        <td><b>Precio</b></td>
+                        <td><b>Borrar</b></td>
+                    </tr>
+                    <?php
+                    if (isset($_SESSION['cesta'])) {
+                        foreach ($_SESSION['cesta'] as $i => $pc) {
+                            echo '<tr>';
+                            echo '<td>', $pc->getProducto()->getNombre(), '</td>';
+                            echo '<td>', $pc->getCantidad(), '</td>';
+                            echo '<td>', $pc->getProducto()->getPrecio(), '</td>';
+                            echo '<td><button name="borrar" value="' . $i . '">X</button></td>';
+                            echo '</tr>';
+                        }
+                    }
+                    ?>
+                </table>
+                <button type="submit" name="crearPedido">Crear Pedido</button>
+            </div>
+        <?php
+        }
+        ?>
     </form>
 </body>
 
