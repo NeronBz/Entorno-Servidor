@@ -19,7 +19,7 @@ return new class extends Migration
             //FK convencion de nombres Laravel
             $table->foreignId('pedido_id')->constrained()->onDelete('restrict')->onUpdate('cascade');
             //FK SIN convencion de nombres Laravel
-            $table->integer('producto');
+            $table->unsignedBigInteger('producto');
             $table->foreign('producto')->references('id')->on('productos')->onDelete('restrict')->onUpdate('cascade');
         });
     }
