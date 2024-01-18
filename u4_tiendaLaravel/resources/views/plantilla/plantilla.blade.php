@@ -33,7 +33,10 @@
         </header>
         <section>
             <div class="container d-flex justify-content-center">
-                @yield('mensaje')
+                {{-- Comprobar si hay mensaje en la variable de sesión --}}
+@if (session('mensaje'))
+<h3 class="text-danger">{{session('mensaje')}}</h3>
+@endif
             </div>
         </section>
         <section>

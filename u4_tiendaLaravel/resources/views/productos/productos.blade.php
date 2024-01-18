@@ -14,27 +14,21 @@
         <th scope="col">Nombre</th>
         <th scope="col">Descripción</th>
         <th scope="col">Precio</th>
+        <th scope="col">Stock</th>
+        <th scope="col">Acciones</th>
       </tr>
     </thead>
     <tbody>
+      @foreach ($productos as $p)
       <tr>
-        <th scope="row">1</th>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>@mdo</td>
+        <th scope="row">{{$p->id}}</th>
+        <td>{{$p->nombre}}</td>
+        <td>{{$p->descripcion}}</td>
+        <td>{{$p->precio}}</td>
+        <td>{{$p->stock}}</td>
       </tr>
-      <tr>
-        <th scope="row">2</th>
-        <td>Jacob</td>
-        <td>Thornton</td>
-        <td>@fat</td>
-      </tr>
-      <tr>
-        <th scope="row">3</th>
-        <td>Larry</td>
-        <td>the Bird</td>
-        <td>@twitter</td>
-      </tr>
+          
+      @endforeach
     </tbody>
   </table>  
 @endsection
