@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClienteC;
+use App\Http\Controllers\LoginC;
 use App\Http\Controllers\PedidoC;
 use App\Http\Controllers\ProductoC;
 use Illuminate\Support\Facades\Route;
@@ -27,16 +28,17 @@ Route::controller(ProductoC::class)->group(function () {
 
     //Definir ruta para crear un producto
     //Ruta básica
-    Route::get('productos/crear', 'crear')->name('crearProducto');
+    Route::get('productos/crearProducto', 'crear')->name('crearProducto');
     Route::post('productos/insertar', 'insertar')->name('insertarProducto');
 
     //Definir una ruta con un parámetro
     //Ruta para borrar un producto concreto, pasando el id
-    Route::get('productos/borrar/{idP}', 'borrar')->name('borrarP');
+    Route::delete('productos/borrar/{idP}', 'borrar')->name('borrarP');
 
     //Definir una ruta con un parámetro
     //Ruta para modificar un producto concreto, pasando el id
     Route::get('productos/modificar/{idP}', 'modificar')->name('modificarP');
+    Route::put('productos/modificar/{idP}', 'actualizar')->name('actualizarP');
 
     //Definir una ruta con un parámetro
     //Ruta para ver un producto concreto, pasando el id
@@ -50,20 +52,21 @@ Route::controller(ClienteC::class)->group(function () {
 
     //Definir ruta para crear un producto
     //Ruta básica
-    Route::get('clientes/crearCliente', 'crearCliente')->name('crearCliente');
+    Route::get('clientes/crearCliente', 'crear')->name('crearCliente');
     Route::post('clientes/insertar', 'insertar')->name('insertarCliente');
 
     //Definir una ruta con un parámetro
     //Ruta para borrar un producto concreto, pasando el id
-    Route::get('clientes/borrar/{idP}', 'borrar')->name('borrarC');
+    Route::delete('clientes/borrar/{idC}', 'borrar')->name('borrarC');
 
     //Definir una ruta con un parámetro
     //Ruta para modificar un producto concreto, pasando el id
-    Route::get('clientes/modificar/{idP}', 'modificar')->name('modificarC');
+    Route::get('clientes/modificar/{idC}', 'modificar')->name('modificarC');
+    Route::put('clientes/modificar/{idC}', 'actualizar')->name('actualizarC');
 
     //Definir una ruta con un parámetro
     //Ruta para ver un producto concreto, pasando el id
-    Route::get('clientes/{idP}', 'ver')->name('verC');
+    Route::get('clientes/{idC}', 'ver')->name('verC');
 });
 
 Route::controller(PedidoC::class)->group(function () {
@@ -87,6 +90,25 @@ Route::controller(PedidoC::class)->group(function () {
     //Definir una ruta con un parámetro
     //Ruta para ver un producto concreto, pasando el id
     Route::get('pedidos/{idP}', 'ver')->name('verPe');
+});
+
+Route::controller(LoginC::class)->group(function () {
+    //Definir una ruta básica para ver todos los productos
+    //Ruta para ver todos los productos
+    Route::get('login', 'login')->name('login'); //Carga el formulario login
+    Route::get('login/registro', 'registro')->name('registro'); //Carga form registro
+    Route::get('login/salir', 'salir')->name('salir'); //Cierra sesión
+    Route::post('login', 'loguear')->name('loguear'); //Inicia sesión si us y ps son válidos
+    Route::post('login/registro', 'registro')->name('registro'); //Crea usuario y clientes
+
+    //Definir una ruta con un parámetro
+    //Ruta para modificar un producto concreto, pasando el id
+    Route::get('productos/modificar/{idP}', 'modificar')->name('modificarP');
+    Route::put('productos/modificar/{idP}', 'actualizar')->name('actualizarP');
+
+    //Definir una ruta con un parámetro
+    //Ruta para ver un producto concreto, pasando el id
+    Route::get('productos/{idP}', 'ver')->name('verP');
 });
 
 

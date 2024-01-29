@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Pedido_Producto extends Model
 {
     use HasFactory;
+    protected $table='pedido_productos';
 
     function pedido()
     {

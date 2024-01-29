@@ -34,9 +34,7 @@
                     if (!isset($_SESSION['cesta'])) {
                         $_SESSION['cesta'] = array();
                     }
-                    if ($_SESSION['cesta']) {
-                        $proCesta = new ProductoEnCesta($producto, $_POST['cantidad']);
-                    }
+                    $proCesta = new ProductoEnCesta($producto, $_POST['cantidad']);
                     $_SESSION['cesta'][] = $proCesta;
                 } else {
                     $mensaje = "Error, el producto seleccionado no existe";

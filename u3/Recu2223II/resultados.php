@@ -54,16 +54,15 @@ if ($bd->getConexion() == null) {
 			</tr>
 			<?php
 			if (isset($_SESSION['partido'])) {
-				foreach ($_SESSION['partido'] as $i => $p) {
-					echo '<tr>';
-					echo '<td>', $p->getCodigo(), '</td>';
-					echo '<td>', $p->getJugador1(), '</td>';
-					echo '<td>', $p->getJugador2(), '</td>';
-					echo '<td>', $p->getFecha(), '</td>';
-					echo '<td>', $p->getNumSets(), '</td>';
-					echo '<td>', $p->getFinalizado(), '</td>';
-					echo '</tr>';
-				}
+				$p = $_SESSION['partido'];
+				echo '<tr>';
+				echo '<td>', $p->getCodigo(), '</td>';
+				echo '<td>', $p->getJugador1(), '</td>';
+				echo '<td>', $p->getJugador2(), '</td>';
+				echo '<td>', $p->getFecha(), '</td>';
+				echo '<td>', $p->getNumSets(), '</td>';
+				echo '<td>', $p->getFinalizado(), '</td>';
+				echo '</tr>';
 			}
 			?>
 		</table>
