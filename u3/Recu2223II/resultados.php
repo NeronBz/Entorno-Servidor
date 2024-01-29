@@ -151,13 +151,7 @@ if ($bd->getConexion() == null) {
 				<td><input type="radio" name="ganador" value="j1" />Gana
 					<?php
 					if ($resultadoP !== null) {
-						foreach ($resultadoP as $res) {
-							if ($res->getJuegosJ1() === null) {
-								echo 'No hay Jugador 1';
-							} else {
-								echo $jugador1->getNombre();
-							}
-						}
+						echo $j1;
 					} else {
 						echo '(Jugador en blanco)';
 					}
@@ -166,13 +160,7 @@ if ($bd->getConexion() == null) {
 				<td><input type="radio" name="ganador" value="j2" />Gana
 					<?php
 					if ($resultadoP !== null) {
-						foreach ($resultadoP as $res) {
-							if ($res->getJuegosJ2() === null) {
-								echo 'No hay Jugador 2';
-							} else {
-								echo $jugador2->getNombre();
-							}
-						}
+						echo $j2;
 					} else {
 						echo '(Jugador en blanco)';
 					}

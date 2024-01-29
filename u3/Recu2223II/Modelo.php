@@ -43,7 +43,7 @@ class Modelo
             $consulta = $this->conexion->prepare('select * from resultadopartido where partido=?');
             $params = array($id);
             if ($consulta->execute($params)) {
-                if ($fila = $consulta->fetch()) {
+                while ($fila = $consulta->fetch()) {
                     $resultado[] = new ResultadoPartido($fila["partido"], $fila["numSet"], $fila["juegosJ1"], $fila["juegosJ2"]);
                 }
             }
