@@ -19,15 +19,32 @@ class Modelo
         }
     }
 
+    function insertarResultadoPartido(ResultadoPartido $rp)
+    {
+        $resultado = false;
+        try {
+            $consulta = $this->conexion->prepare('insert into resultadopartido values(?,?,?,?)');
+            $params = array(
+                $rp->getPartido(), $rp->getNumSet(), $rp->getJuegosJ1(), $rp->getJuegosJ2()
+            );
+            if ($consulta->execute($params)) {
+                $resultado = true;
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
     function obtenerResultadoPartido($id)
     {
-        $resultado = null;
+        $resultado = array();
         try {
             $consulta = $this->conexion->prepare('select * from resultadopartido where partido=?');
             $params = array($id);
             if ($consulta->execute($params)) {
                 if ($fila = $consulta->fetch()) {
-                    $resultado = new ResultadoPartido($fila["partido"], $fila["numSet"], $fila["juegosJ1"], $fila["juegosJ2"]);
+                    $resultado[] = new ResultadoPartido($fila["partido"], $fila["numSet"], $fila["juegosJ1"], $fila["juegosJ2"]);
                 }
             }
         } catch (PDOException $e) {

@@ -15,6 +15,18 @@ if ($bd->getConexion() == null) {
 		if (isset($_POST['cambiar'])) {
 			session_unset();
 			header('location:index.php');
+		} elseif (isset($_POST['grabarSet'])) {
+			if (empty($_POST['juegosJ1']) or empty($_POST['juegosJ2'])) {
+				$mensaje = "Los campos de los juegos de jugadores están vacíos";
+			} else {
+				$p = $_SESSION['partido'];
+				$rp = new ResultadoPartido($_SESSION['codPartido'], $_POST['set'], $_POST['juegosJ1'], $_POST['juegosJ2']);
+				if ($bd->insertarResultadoPartido($rp)) {
+					$mensaje = 'Resultado del partido definido';
+				} else {
+					$mensaje = 'Error al guardar resultados';
+				}
+			}
 		}
 	}
 }
@@ -40,8 +52,6 @@ if ($bd->getConexion() == null) {
 			?>
 		</h1>
 		<h2 style="color:red;"><?php if (isset($mensaje)) echo $mensaje ?></h2>
-		<hr />
-		<h2 style="color:red;">mensaje si es necesario</h2>
 		<hr />
 		<h2>Datos del Partido</h2>
 		<table width="50%">
@@ -107,7 +117,29 @@ if ($bd->getConexion() == null) {
 				<th align="left">Acción</th>
 			</tr>
 			<tr>
+				<?php
+				$resultadoP = $bd->obtenerResultadoPartido($_SESSION['codPartido']);
+				if (empty($resultadoP)) {
+					echo 'No hay ningún resultado de partido';
+				} else {
+					foreach ($resultadoP as $resul) {
+						echo '<tr>';
+						echo '<td>', $resul->getNumSet(), '</td>';
+						echo '<td>', $resul->getJuegosJ1(), '</td>';
+						echo '<td>', $resul->getJuegosJ2(), '</td>';
+						echo '</tr>';
+					}
+				}
+				?>
+			</tr>
+			<tr>
 				<td><select name="set">
+						<?php
+						$nSet = 6;
+						for ($i = 1; $i < $nSet; $i++) {
+							echo '<option value"' . $i . '">' . $i . '</option>';
+						}
+						?>
 					</select></td>
 				<td><input type="number" name="juegosJ1" /></td>
 				<td><input type="number" name="juegosJ2" /></td>
@@ -118,13 +150,37 @@ if ($bd->getConexion() == null) {
 				<td></td>
 				<td><input type="radio" name="ganador" value="j1" />Gana
 					<?php
-					$ganadorj1 = $bd->obtenerResultadoPartido($p);
-					echo $ganadorj1;
+					if ($resultadoP !== null) {
+						foreach ($resultadoP as $res) {
+							if ($res->getJuegosJ1() === null) {
+								echo 'No hay Jugador 1';
+							} else {
+								echo $jugador1->getNombre();
+							}
+						}
+					} else {
+						echo '(Jugador en blanco)';
+					}
 					?>
 				</td>
-				<td><input type="radio" name="ganador" value="j2" />Gana Jugador2</td>
+				<td><input type="radio" name="ganador" value="j2" />Gana
+					<?php
+					if ($resultadoP !== null) {
+						foreach ($resultadoP as $res) {
+							if ($res->getJuegosJ2() === null) {
+								echo 'No hay Jugador 2';
+							} else {
+								echo $jugador2->getNombre();
+							}
+						}
+					} else {
+						echo '(Jugador en blanco)';
+					}
+					?>
+				</td>
 				<td><input type="submit" name="finPartido" value="Finalizar" /></td>
 			</tr>
+
 		</table>
 	</form>
 </body>
