@@ -62,15 +62,11 @@ if ($bd->getConexion() == null) {
 				echo '<td>', $p->getJugador2(), '</td>';
 				echo '<td>', $p->getFecha(), '</td>';
 				echo '<td>', $p->getNumSets(), '</td>';
-<<<<<<< HEAD
-				echo '<td>', $p->getFinalizado(), '</td>';
-=======
 				if ($p->getFinalizado() == 0) {
 					echo '<td>No</td>';
 				} elseif ($p->getFinalizado() == 1) {
 					echo '<td>Sí</td>';
 				}
->>>>>>> 5c356e607bbfd9c617a4ff7702bac59931857a10
 				echo '</tr>';
 			}
 			?>
