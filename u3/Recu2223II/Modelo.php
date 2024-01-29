@@ -19,18 +19,51 @@ class Modelo
         }
     }
 
-    function obtenerJugadoresPartido($j1, $j2)
+    function obtenerResultadoPartido($id)
+    {
+        $resultado = null;
+        try {
+            $consulta = $this->conexion->prepare('select * from resultadopartido where partido=?');
+            $params = array($id);
+            if ($consulta->execute($params)) {
+                if ($fila = $consulta->fetch()) {
+                    $resultado = new ResultadoPartido($fila["partido"], $fila["numSet"], $fila["juegosJ1"], $fila["juegosJ2"]);
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function calcularJugados($jugados)
+    {
+        $resultado = null;
+        try {
+            $consulta = $this->conexion->prepare("SELECT COUNT(*) as jugados FROM partido WHERE finalizado = true AND (jugador1 = ? OR jugador2 = ?)");
+            $params = array($jugados, $jugados);
+
+            if ($consulta->execute($params)) {
+                $fila = $consulta->fetch();
+                if ($fila) {
+                    $resultado = $fila['jugados'];
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $resultado;
+    }
+
+    function obtenerJugadorPartido($j1)
     {
         $resultado = array();
         try {
-            $consulta = $this->conexion->prepare("select count(*) as jugados from partido where finalizado=true 
-            and (jugador1 = ? or jugador2 = ?)");
-            $params = array($j1, $j2);
+            $consulta = $this->conexion->prepare("select * from jugador where nombre=?");
+            $params = array($j1);
             if ($consulta->execute($params)) {
-                //Ver si se ha devuelto 1 registro con el usuario
                 if ($fila = $consulta->fetch()) {
-                    //Se ha encontrado el usuario
-                    $resultado = new Partido($fila["codigo"], $fila["jugador1"], $fila["jugador2"], $fila["fecha"], $fila["numSets"], false);
+                    $resultado = new Jugador($fila["nombre"], $fila["ganados"]);
                 }
             }
         } catch (PDOException $e) {
@@ -46,7 +79,7 @@ class Modelo
             $consulta = $this->conexion->query("select * from partido");
             if ($consulta->execute()) {
                 while ($fila = $consulta->fetch()) {
-                    $partido = new Partido($fila["codigo"], $fila["jugador1"], $fila["jugador2"], $fila["fecha"], $fila["numSets"], false);
+                    $partido = new Partido($fila["codigo"], $fila["jugador1"], $fila["jugador2"], $fila["fecha"], $fila["numSets"], $fila['finalizado']);
                     $resultado[] = $partido;
                 }
             }
@@ -66,7 +99,7 @@ class Modelo
                 //Ver si se ha devuelto 1 registro con el usuario
                 if ($fila = $consulta->fetch()) {
                     //Se ha encontrado el usuario
-                    $resultado = new Partido($fila["codigo"], $fila["jugador1"], $fila["jugador2"], $fila["fecha"], $fila["numSets"], false);
+                    $resultado = new Partido($fila["codigo"], $fila["jugador1"], $fila["jugador2"], $fila["fecha"], $fila["numSets"], $fila['finalizado']);
                 }
             }
         } catch (PDOException $e) {

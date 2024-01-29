@@ -51,6 +51,7 @@ if ($bd->getConexion() == null) {
 				<td><b>Jugador 2</b></td>
 				<td><b>Fecha</b></td>
 				<td><b>Número de Sets</b></td>
+				<td><b>Finalizado</b></td>
 			</tr>
 			<?php
 			if (isset($_SESSION['partido'])) {
@@ -61,7 +62,15 @@ if ($bd->getConexion() == null) {
 				echo '<td>', $p->getJugador2(), '</td>';
 				echo '<td>', $p->getFecha(), '</td>';
 				echo '<td>', $p->getNumSets(), '</td>';
+<<<<<<< HEAD
 				echo '<td>', $p->getFinalizado(), '</td>';
+=======
+				if ($p->getFinalizado() == 0) {
+					echo '<td>No</td>';
+				} elseif ($p->getFinalizado() == 1) {
+					echo '<td>Sí</td>';
+				}
+>>>>>>> 5c356e607bbfd9c617a4ff7702bac59931857a10
 				echo '</tr>';
 			}
 			?>
@@ -74,6 +83,22 @@ if ($bd->getConexion() == null) {
 				<th align="left">Ganados</th>
 				<th align="left">Jugados</th>
 			</tr>
+			<?php
+			$jugador1 = $bd->obtenerJugadorPartido($j1);
+			$jugador2 = $bd->obtenerJugadorPartido($j2);
+			$jugados1 = $bd->calcularJugados($j1);
+			$jugados2 = $bd->calcularJugados($j2);
+			echo '<tr>';
+			echo '<td>', $jugador1->getNombre(), '</td>';
+			echo '<td>', $jugador1->getGanados(), '</td>';
+			echo '<td>', $jugados1, '</td>';
+			echo '</tr>';
+			echo '<tr>';
+			echo '<td>', $jugador2->getNombre(), '</td>';
+			echo '<td>', $jugador2->getGanados(), '</td>';
+			echo '<td>', $jugados2, '</td>';
+			echo '</tr>';
+			?>
 		</table>
 		<hr />
 
@@ -95,7 +120,12 @@ if ($bd->getConexion() == null) {
 			</tr>
 			<tr>
 				<td></td>
-				<td><input type="radio" name="ganador" value="j1" />Gana Jugador1</td>
+				<td><input type="radio" name="ganador" value="j1" />Gana
+					<?php
+					$ganadorj1 = $bd->obtenerResultadoPartido($p);
+					echo $ganadorj1;
+					?>
+				</td>
 				<td><input type="radio" name="ganador" value="j2" />Gana Jugador2</td>
 				<td><input type="submit" name="finPartido" value="Finalizar" /></td>
 			</tr>

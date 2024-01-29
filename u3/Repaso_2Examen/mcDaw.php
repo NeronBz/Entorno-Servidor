@@ -40,6 +40,9 @@
                     $mensaje = "Error, el producto seleccionado no existe";
                 }
             }
+        } elseif (isset($_POST['crearPedido'])) {
+            if (isset($_SESSION['cesta']) and !empty($_SESSION['cesta'])) {
+            }
         }
     }
     ?>
