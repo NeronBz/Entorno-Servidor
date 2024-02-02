@@ -20,33 +20,52 @@ function login(string $usuario, string $ps)
     return $resultado;
 }
 // Login por método
+function obtenerUsuario(string $usuario, string $ps)
+{
+    $resultado = null;
+    try {
+        $consulta = $this->conexion->prepare('select * from usuario where usuario=? and clave=sha2(?,0)');
+        $params = array($usuario, $ps);
+        if ($consulta->execute($params)) {
+            //Ver si se ha devuelto 1 registro con el usuario
+            if ($fila = $consulta->fetch()) {
+                //Se ha encontrado el usuario
+                $resultado = new Usuario($fila['usuario'], $fila['tipo']);
+            }
+        }
+    } catch (PDOException $e) {
+        echo $e->getMessage();
+    }
+    return $resultado;
+}
+
 function crearCliente($usuario, $nombre, $ape, $dni, $telef)
-    {
-        $resultado = false;
-        try {
-            $this->conexion->beginTransaction();
-            $consulta = $this->conexion->prepare("insert into usuario values(?,sha2(?,0),'C')");
-            $params = array($usuario, $dni);
+{
+    $resultado = false;
+    try {
+        $this->conexion->beginTransaction();
+        $consulta = $this->conexion->prepare("insert into usuario values(?,sha2(?,0),'C')");
+        $params = array($usuario, $dni);
+        if ($consulta->execute($params)) {
+            $resultado = true;
+            $consulta = $this->conexion->prepare("insert into cliente 
+                    values(null,?,?,?,?,?,false)");
+            $params = array($usuario, $dni, $ape, $nombre, $telef);
             if ($consulta->execute($params)) {
                 $resultado = true;
-                $consulta = $this->conexion->prepare("insert into cliente 
-                    values(null,?,?,?,?,?,false)");
-                $params = array($usuario, $dni, $ape, $nombre, $telef);
-                if ($consulta->execute($params)) {
-                    $resultado = true;
-                    $this->conexion->commit();
-                } else {
-                    $this->conexion->rollBack();
-                }
+                $this->conexion->commit();
             } else {
                 $this->conexion->rollBack();
             }
-        } catch (PDOException $e) {
+        } else {
             $this->conexion->rollBack();
-            echo $e->getMessage();
         }
-        return $resultado;
+    } catch (PDOException $e) {
+        $this->conexion->rollBack();
+        echo $e->getMessage();
     }
+    return $resultado;
+}
 // Login normal (no método)
 if (isset($_POST['acceder'])) {
     if (empty($_POST['usuario']) or empty($_POST['ps'])) {
