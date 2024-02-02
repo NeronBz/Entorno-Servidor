@@ -12,7 +12,12 @@
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <input type="text" id="email" class="form-control" name="email" placeholder="Email"
-                value="{{ $c->email }}">
+                value="{{ $c->usuario->email }}">
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Nombre</label>
+            <input type="text" id="email" class="form-control" name="email" placeholder="Email"
+                value="{{ $c->usuario->name }}">
         </div>
         <div class="mb-3">
             <label for="telefono" class="form-label">Teléfono</label>

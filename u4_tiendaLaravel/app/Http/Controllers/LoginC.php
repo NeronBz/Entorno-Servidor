@@ -6,7 +6,9 @@ use App\Models\Cliente;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use PDOException;
 
 class LoginC extends Controller
 {
@@ -24,10 +26,26 @@ class LoginC extends Controller
     function salir()
     {
         //Cerrar la sesión y redirigir a login
+        Auth::logout();
+        return redirect(route('login'));
     }
-    function loguear()
+    function loguear(Request $r)
     {
         //Abrir sesión si us y ps son correctos
+        $r->validate([
+            'email' => 'required|email:rfc,dns',
+            'ps' => 'required'
+        ]);
+        $credenciales = [
+            'email' => $r->email,
+            'password' => $r->ps
+        ];
+        if (Auth::attempt($credenciales)) {
+            $r->session()->regenerate();
+            return redirect()->route('productos');
+        } else {
+            return redirect()->back()->with('mensaje', 'Datos incorrectos');
+        }
     }
     function registrar(Request $request)
     {
@@ -37,31 +55,43 @@ class LoginC extends Controller
             //Requerido y formato string
             'nombre' => 'required|string',
             //Email, requerido formato email y no se puede repetir
-            'email' => 'required|string|email|unique:User, email',
+            'email' => 'required|string|email|unique:Users,email',
             'ps1' => 'required',
             'ps2' => 'required|same:ps1', //Requerida e igual a ps1
             'telf' => 'required',
             'dir' => 'required',
         ]);
-        //Crear usuario en tabla users
-        $u = new User();
-        $u->name = $request->nombre;
-        $u->email = $request->email;
-        $u->password = Hash::make($request->ps1);
-        $u->tipo = 'C';
-        if ($u->save()) {
-            //Crear el cliente
-            $c = new Cliente();
-            $c->telefono = $request->telf;
-            $c->direccion = $request->dir;
-            $c->user_id = $u->id;
-            if ($c->save()) {
-                //Logueamos el usuario directamento
-                Auth::login($u);
+        $error = false;
+        try {
+            DB::transaction(function () use ($request) {
+                //Crear usuario en tabla users
+                $u = new User();
+                $u->name = $request->nombre;
+                $u->email = $request->email;
+                $u->password = Hash::make($request->ps1);
+                $u->tipo = 'C';
+                if ($u->save()) {
+                    //Crear el cliente
+                    $c = new Cliente();
+                    $c->telefono = $request->telf;
+                    $c->direccion = $request->dir;
+                    $c->user_id = $u->id;
+                    if ($c->save()) {
+                        //Logueamos el usuario directamento
+                        Auth::login($u);
+                        return redirect()->route('productos');
+                    }
+                } else {
+                    return back()->with('mensaje', 'Error al crear el usuario');
+                }
+            });
+        } catch (PDOException $e) {
+            $error = true;
+            return back()->with('mensaje', $e->getMessage());
+        } finally {
+            if (!$error) {
                 return redirect()->route('productos');
             }
-        } else {
-            return back()->with('mensaje', 'Error al crear el usuario');
         }
     }
 }

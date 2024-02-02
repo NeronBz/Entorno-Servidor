@@ -52,8 +52,8 @@ Route::controller(ClienteC::class)->group(function () {
 
     //Definir ruta para crear un producto
     //Ruta básica
-    Route::get('clientes/crearCliente', 'crear')->name('crearCliente');
-    Route::post('clientes/insertar', 'insertar')->name('insertarCliente');
+    // Route::get('clientes/crearCliente', 'crear')->name('crearCliente');
+    // Route::post('clientes/insertar', 'insertar')->name('insertarCliente');
 
     //Definir una ruta con un parámetro
     //Ruta para borrar un producto concreto, pasando el id
@@ -99,16 +99,7 @@ Route::controller(LoginC::class)->group(function () {
     Route::get('login/registro', 'registro')->name('registro'); //Carga form registro
     Route::get('login/salir', 'salir')->name('salir'); //Cierra sesión
     Route::post('login', 'loguear')->name('loguear'); //Inicia sesión si us y ps son válidos
-    Route::post('login/registro', 'registro')->name('registrar'); //Crea usuario y clientes
-
-    //Definir una ruta con un parámetro
-    //Ruta para modificar un producto concreto, pasando el id
-    Route::get('productos/modificar/{idP}', 'modificar')->name('modificarP');
-    Route::put('productos/modificar/{idP}', 'actualizar')->name('actualizarP');
-
-    //Definir una ruta con un parámetro
-    //Ruta para ver un producto concreto, pasando el id
-    Route::get('productos/{idP}', 'ver')->name('verP');
+    Route::post('login/registro', 'registrar')->name('registrar'); //Crea usuario y clientes
 });
 
 

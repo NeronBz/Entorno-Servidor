@@ -16,4 +16,9 @@ class Cliente extends Model
         //Si seguimos la covención de nombres de Laravel
         return $this->HasMany(Pedido::class)->get();
     }
+
+    function usuario()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

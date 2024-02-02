@@ -18,8 +18,15 @@
 
 <body>
     <header>
-        <div class="justify-content-center">
-            <img src="{{ asset('img/logo.jpg') }}" alt="" style="width: 20%">
+        <div style="display:flex; justify-content:space-between">
+            <div style="display:flex; align-items:center"> 
+                <img src="{{ asset('img/logo.jpg') }}" alt="" style="width: 20%">
+            </div>
+           <div style="display:flex; align-items:center">
+            <h3>{{Auth::user()->name}}</h3>
+            <a href="{{route('salir')}}" class="btn btn-outline-success">Salir</a>
+           </div>
+        
         </div>
         <h1 class="text-center">@yield('titulo')</h1>
         <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-center">

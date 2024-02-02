@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 
 class PedidoC extends Controller
 {
+    function __construct()
+    {
+        $this->middleware('auth');
+    }
     function pedidos()
     {
         return view('pedidos/pedidos');
