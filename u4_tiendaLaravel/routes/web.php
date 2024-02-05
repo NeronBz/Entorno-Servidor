@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CarritoC;
 use App\Http\Controllers\ClienteC;
 use App\Http\Controllers\LoginC;
 use App\Http\Controllers\PedidoC;
@@ -100,6 +101,10 @@ Route::controller(LoginC::class)->group(function () {
     Route::get('login/salir', 'salir')->name('salir'); //Cierra sesión
     Route::post('login', 'loguear')->name('loguear'); //Inicia sesión si us y ps son válidos
     Route::post('login/registro', 'registrar')->name('registrar'); //Crea usuario y clientes
+});
+
+Route::controller(CarritoC::class)->group(function () {
+    Route::post('carrito', 'insertarCarrito')->name('aCarrito');
 });
 
 

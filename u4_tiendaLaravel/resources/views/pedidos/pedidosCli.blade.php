@@ -1,5 +1,5 @@
 @extends('plantilla/plantilla')
-@section('titulo', 'PEDIDOS')
+@section('titulo', 'PEDIDOS DE '.Auth::user()->name)
 @section('mensaje')
     <h3 class="text-danger">Espacio para mensaje</h3>
 @endsection
