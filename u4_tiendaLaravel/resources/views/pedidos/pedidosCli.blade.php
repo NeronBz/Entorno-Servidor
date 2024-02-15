@@ -16,20 +16,7 @@
     <tbody>
       @foreach ($pedidos as $pe)
           <tr>
-              <th scope="row">{{ $p->id }}</th>
-              <td>{{ $p->nombre }}</td>
-              <td>{{ $p->descripcion }}</td>
-              <td>{{ $p->precio }}</td>
-              <td>{{ $p->stock }}</td>
-              <td><img src="{{ asset('storage/' . $p->img) }}" width="100px"></td>
-              <td>
-                  <a class="btn btn-success" href="{{ route('modificarP', $p->id) }}">Modificar</a>
-                  <form action="{{ route('borrarP', $p->id) }}" method="POST">
-                      @method('DELETE')
-                      @csrf
-                      <button type="submit" class="btn btn-danger">Borrar</button>
-                  </form>
-              </td>
+              <th scope="row">{{ $pe->id }}</th>
           </tr>
       @endforeach
   </tbody>

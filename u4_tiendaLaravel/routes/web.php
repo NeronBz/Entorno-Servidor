@@ -77,7 +77,7 @@ Route::controller(PedidoC::class)->group(function () {
 
     //Definir ruta para crear un producto
     //Ruta básica
-    Route::get('pedidos/crearPedido', 'crearPedido')->name('crearPedido');
+    Route::post('pedidos/crearPedido', 'crearPedido')->name('crearPedido');
     Route::post('pedidos/insertar', 'insertar')->name('insertarPedido');
 
     //Definir una ruta con un parámetro
@@ -105,6 +105,8 @@ Route::controller(LoginC::class)->group(function () {
 
 Route::controller(CarritoC::class)->group(function () {
     Route::post('carrito', 'insertarCarrito')->name('aCarrito');
+    Route::get('carrito/verCarrito', 'verCarrito')->name('verCarrito');
+    Route::post('carrito/modificarCarrito', 'modificarCarrito')->name('modificarCarrito');
 });
 
 

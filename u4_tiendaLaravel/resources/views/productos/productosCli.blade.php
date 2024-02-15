@@ -26,9 +26,10 @@
                     <td>{{ $p->stock }}</td>
                     <td><img src="{{ asset('storage/' . $p->img) }}" width="100px"></td>
                     <td>
-                        <form action="{{ route('aCarrito', $p->id) }}" method="POST">
+                        <form action="{{ route('aCarrito') }}" method="POST">
                         @csrf
-                        <button type="submit" class="btn btn-success">Carrito</button>
+                        <button type="submit" class="btn btn-success"
+                        name="carrito" value="{{$p->id}}">Carrito</button>
                         </form>
                     </td>
                 </tr>

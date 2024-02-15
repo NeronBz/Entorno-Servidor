@@ -25,6 +25,10 @@
            <div style="display:flex; align-items:center">
             <h3>{{Auth::user()->name}}</h3>
             <a href="{{route('salir')}}" class="btn btn-outline-success">Salir</a>
+            {{-- Mostrar nº de productos en carrito --}}
+            @if (session('carrito')!=null)
+                <a href="{{route('verCarrito')}}"><h3>Carrito:{{sizeof(session('carrito'))}}</h3></a>
+            @endif
            </div>
         
         </div>
