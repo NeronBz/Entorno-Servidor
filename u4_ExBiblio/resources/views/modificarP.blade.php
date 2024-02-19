@@ -7,15 +7,13 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>PRÉSTAMOS</h1>
-    <form action="{{route('rutaInsertar')}}" method="POST">
+    <h1>MODIFICAR PRÉSTAMO</h1>
+    <form action="{{route('rutaActualizar', $p->id)}}" method="POST">
     @csrf
+    <label for="Id">Id</label>
+    <input type="number" name="id" disabled="disabled" value="{{$p->id}}">
     <label for="fecha">Fecha</label>
-@if (old('fecha')!=null)
-    <input type="date" name="fecha" value="{{old('fecha')}}">
-    @else
-<input type="date" name="fecha" value="{{date('Y-m-d')}}">
-    @endif
+    <input type="date" name="fecha" value="{{$p->fecha}}">
     @error('fecha')
         <div>
             Rellena Fecha
@@ -25,7 +23,7 @@
     <label for="libro">Libro</label>
     <select name="libro" id="libro">
         @foreach ($libros as $l)
-        @if(old('libro')!=null and old('libro')==$l->id)
+        @if($p->id==$l->id)
         <option value="{{$l->id}}" selected="selected">{{$l->titulo}}</option>
         @else
         <option value="{{$l->id}}">{{$l->titulo}}</option>
@@ -39,15 +37,18 @@
     @enderror
 
     <label for="cliente">Cliente</label>
-    <input type="text" name="cliente" value="{{old('cliente')}}">
+    <input type="text" name="cliente" value="{{$p->nombreCliente}}">
     @error('cliente')
         <div>
             Rellena Cliente
         </div>
     @enderror
 
-    <button type="submit">Crear</button>
-    <button type="reset">Limpiar</button>
+        <label for="fechaD">Fecha Devolución</label>
+    <input type="date" name="fechaD" value="{{$p->fechaDevolucion}}">
+
+    <button type="submit">Modificar</button>
+    <a href="{{route('rutaVer')}}">Cancelar</a>
 </form>
 <div style="color:red">
     @if(session('mensaje')!=null)
