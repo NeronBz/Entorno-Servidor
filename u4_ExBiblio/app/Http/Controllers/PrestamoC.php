@@ -82,4 +82,63 @@ class PrestamoC extends Controller
             return back()->with('mensaje', 'Error, libro no existe o no hay ejemplares');
         }
     }
+
+    function actualizar(Request $r, $id)
+    {
+        $r->validate([
+            'fecha' => 'required',
+            'libro' => 'required',
+            'cliente' => 'required',
+        ]);
+        //Chequear si se cambia el libro para
+        //chequear ejemplares
+        $p = Prestamo::find($id);
+        $libroAntiguo = $p->libro_id;
+        if ($p->libro_id != $r->libro) {
+            //Chequear ejemplares de libro nuevo
+            $l = Libro::find($r->libro);
+            if ($l == null or $l->numEjemplares <= 0) {
+                return back()->with('mensaje', 'Libro no existe o no hay ejemplares');
+            }
+        }
+        //Cambiar los datos del préstamo por los nuevos
+        $p->fecha = $r->fecha;
+        $p->nombreCliente = $r->cliente;
+        $p->fechaDevolucion = $r->fechaD;
+        $p->libro_id = $r->libro;
+
+        //Registrar préstamos y actualizar nº de ejemplares
+        $error = false;
+        $mensaje = "";
+        try {
+            DB::transaction(function () use ($p, $error, $libroAntiguo) {
+                //Update préstamo
+                if ($p->save()) {
+                    if ($p->libro_id != $libroAntiguo) {
+                        //Modificar el nº de ejemplares del nuevo
+                        $p->libro->numEjemplares = $p->libro->numEjemplares - 1;
+                        if (!$p->libro->save()) {
+                            $error = true;
+                        }
+                        //Update del libro antiguo
+                        $liA = Libro::find($libroAntiguo);
+                        $liA->numEjemplares++;
+                        if (!$liA->save()) {
+                            $error = true;
+                        }
+                    }
+                } else {
+                    $error = true;
+                }
+            });
+        } catch (Exception $e) {
+            $mensaje = $e->getMessage();
+        } finally {
+            if ($error) {
+                return back()->with('mensaje', $mensaje);
+            } else {
+                return redirect()->route('rutaVer');
+            }
+        }
+    }
 }
