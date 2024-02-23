@@ -55,7 +55,7 @@ class LoginC extends Controller
             //Requerido y formato string
             'nombre' => 'required|string',
             //Email, requerido formato email y no se puede repetir
-            'email' => 'required|string|email|unique:Users,email',
+            'email' => 'required|string|email|unique:App\Models\User,email',
             'ps1' => 'required',
             'ps2' => 'required|same:ps1', //Requerida e igual a ps1
             'telf' => 'required',
