@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Pedido;
-use Illuminate\Http\Request;
-use App\Models\Producto;
 use App\Models\Cliente;
+use App\Models\Pedido;
+use App\Models\Pedido_Producto;
+use App\Models\Producto;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PDOException;
 
 class ApiPedido extends Controller
 {
@@ -32,7 +34,7 @@ class ApiPedido extends Controller
     public function store(Request $request)
     {
         //Crea un pedido con un producto
-        //Parámetros: idP, idC, cantidad, 
+        //Parámetros: idP, idC, cantidad,
         $request->validate([
             'idP' => 'required',
             'idC' => 'required',
@@ -43,50 +45,44 @@ class ApiPedido extends Controller
             return response()->json('Error, no existe el producto', 500);
         }
         if ($p->stock < $request->cantidad) {
-            return response()->json('Error, no hay stock', 500);
+            return response()->json('Error, no hoy stock', 500);
+        } else {
+            $cant = $request->cantidad;
         }
         $c = Cliente::find($request->idC);
-        if ($p->stock < $request->cantidad) {
-            return response()->json('Error, no hay stock', 500);
+        if ($c == null) {
+            return response()->json('Error, no existe el cliente', 500);
         }
         $error = false;
+        $ped = null;
         try {
             //Creamos el pedido en una transacción
             //ya que hay que hacer inserts en 2 tablas: pedidos y pedido_productos
-            DB::transaction(function () use ($request) {
-                //Crear el pedido a partir de la variable de sesión y del usuario logueado
-                $p = new Pedido();
-                $p->fecha = date('YmdHis');
-                //Recuperamos el cliente
-                $c = Cliente::where('user_id', Auth::user()->id)->first();
-                $p->cliente_id = $c->id;
-
-                //Guardar pedido
-                if ($p->save()) {
-                    //Crear un pedido_producto para cada producto que haya en el carrito
-                    $carrito = session('carrito');
-                    foreach ($carrito as $pc) {
-                        $nuevo = new Pedido_Producto();
-                        $nuevo->cantidad = $pc['cantidad'];
-                        $nuevo->precioU = $pc['producto']->precio;
-                        $nuevo->pedido_id = $p->id;
-                        $nuevo->producto = $pc['producto']->id;
-                        $nuevo->save();
+            DB::transaction(function () use ($p, $c, $cant, $ped) {
+                //Crear el pedido a partir del variable de sesión
+                //y del usuario logueado
+                $ped = new Pedido();
+                $ped->fecha = date('YmdHis');
+                $ped->cliente_id = $c->id;
+                if ($ped->save()) {
+                    //Guardar producto en pedido
+                    $nuevo = new Pedido_Producto();
+                    $nuevo->cantidad = $cant;
+                    $nuevo->precioU = $p->precio;
+                    $nuevo->pedido_id = $ped->id;
+                    $nuevo->producto = $p->id;
+                    if ($nuevo->save()) {
+                        $p->stock = $p->stock - $cant;
+                        $p->save();
                     }
                 }
             });
-        } catch (Exception $e) {
+        } catch (PDOException $e) {
             $error = true;
-            return back()->with('mensaje', 'Error no se ha creado el pedido' . $e->getMessage());
-        } finally {
-            if (!$error) {
-                //Eliminar el carrito de la sesión
-                session()->forget('carrito');
-                return redirect()->route('pedidos')->with('mensaje', 'Pedido creado');
-            }
+            return response()->json($e->getMessage(), 500);
         }
+        return $ped;
     }
-
 
     /**
      * Display the specified resource.
