@@ -68,7 +68,7 @@ class ApiLogin extends Controller
     {
         //Abrir sesión si us y ps son correctos
         $r->validate([
-            'email' => 'required|email:rfc,dns',
+            'email' => 'required|email',
             'ps' => 'required'
         ]);
         $credenciales = [
