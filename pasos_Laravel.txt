@@ -1,0 +1,9 @@
+Para crear un proyecto: composer create-project laravel/laravel [nombreProyecto]
+Creación de controller: php artisan make:controller [nombre]Controller
+Cambiar en el .env los datos del database, username y password
+Ejecutar las migraciones: php artisan migrate
+Hacer mi propia migración: php artisan make:migration create_[nombreTabla]_table
+Crear un modelo: php artisan make:model Coche --migration
+Añadir campo con una migración:  php artisan make:migration add_[nombre]_to_[tabla]_table
+Modificar campo con una migración:  php artisan make:migration modificarColumnas_to_[nombre]_table
+Con las relaciones 1:N, tenemos que definir en un modelo las funciones de la tabla contraria la cual está relacionada con la primera, y dependiendo de si es 1 o N, poner belongsTo o hasMany
