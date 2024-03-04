@@ -14,6 +14,10 @@ return new class extends Migration
         Schema::create('ventas', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->date('fecha');
+            $table->foreignId('producto_id')->constrained()->onDelete('restrict')->onUpdate('cascade');
+            $table->integer('cantidad');
+            $table->integer('precioUnitario');
         });
     }
 
